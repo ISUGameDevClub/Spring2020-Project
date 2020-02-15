@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Player movement
     public float walkSpeed;
     public float runSpeed;
     public float crouchSpeed;
@@ -16,8 +17,17 @@ public class PlayerController : MonoBehaviour
     public float runControl;
     public float airControl;
 
+    // Power Ups
+    public bool lowGravity;
+    public bool SpeedBoost; 
+    public bool doubleJump;
+
+    // Power Up variables
+    public float lowGravityModifier;
+    public float speedBoostModifier;
 
     private Rigidbody rb;
+    private Animator camAnim;
     private float floorRaycastDistance; // how far the player can be off the ground and still jump
     private float wallRaycastDistance;
 
@@ -29,13 +39,14 @@ public class PlayerController : MonoBehaviour
     private bool inWind;
     private Vector3 windDirection;
     private float windPower;
-    private Animator camAnim;
+
     private float grav = -9.81f;
 
     private bool disableRight;
     private bool disableLeft;
     private bool canStand;
 
+    private bool hasSecondJump;
 
     void Start()
     {
@@ -50,9 +61,10 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if ((isGrounded() || wallRunning != 0) && transform.localScale.y == 1)
-        {
             Jump();
-        }
+
+        if (doubleJump && hasSecondJump && !isGrounded() && wallRunning == 0 && transform.localScale.y == 1)
+            DoubleJump();
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
             running = !running;
@@ -60,7 +72,9 @@ public class PlayerController : MonoBehaviour
         if (!crouching && Input.GetKey(KeyCode.LeftControl) && isGrounded() && (transform.localScale.y == 1))
         {
             crouching = true;
-            rb.AddForce(slideForce * transform.forward, ForceMode.Impulse);
+            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+            if(rb.velocity.magnitude > 6)
+                rb.AddForce(slideForce * transform.forward, ForceMode.Impulse);
             canStand = false;
             StartCoroutine(AllowStanding());
         }
@@ -87,6 +101,10 @@ public class PlayerController : MonoBehaviour
             gravity = grav * gravityScale * Vector3.up;
         else
             gravity = grav * gravityScale * 3 * Vector3.up;
+
+        if (lowGravity)
+            gravity *= lowGravityModifier;
+
         rb.AddForce(gravity, ForceMode.Acceleration);
         WallRun();
         Move();
@@ -105,17 +123,22 @@ public class PlayerController : MonoBehaviour
         if (disableLeft && HorMovement < 0)
             HorMovement = 0;
 
+        Vector3 inputDirection = rb.transform.TransformDirection(new Vector3(HorMovement, 0, VerMovement)).normalized;
+
         Vector3 finalVelocity;
 
         if (crouching)
-            finalVelocity = rb.transform.TransformDirection(new Vector3(HorMovement, 0, VerMovement).normalized * crouchSpeed);
+            finalVelocity = inputDirection * crouchSpeed;
         else if(running)
-            finalVelocity = rb.transform.TransformDirection(new Vector3(HorMovement, 0, VerMovement).normalized * runSpeed);
+            finalVelocity = inputDirection * runSpeed;
         else
-            finalVelocity = rb.transform.TransformDirection(new Vector3(HorMovement, 0, VerMovement).normalized * walkSpeed);
+            finalVelocity = inputDirection * walkSpeed;
 
         if (wallRunning != 0)
             finalVelocity *= (1 + wallRunningSpeedBoost);
+
+        if (SpeedBoost)
+            finalVelocity *= (1 + speedBoostModifier);
 
         finalVelocity = new Vector3(finalVelocity.x, rb.velocity.y, finalVelocity.z);
 
@@ -134,15 +157,18 @@ public class PlayerController : MonoBehaviour
             playerControl = airControl;
 
         Vector3 finalHorVelocity = Vector3.Lerp(rb.velocity, new Vector3(finalVelocity.x, 0, finalVelocity.z), playerControl * Time.deltaTime * 10);
-        Debug.Log(playerControl * Time.deltaTime * 100);
 
         rb.velocity = new Vector3(finalHorVelocity.x , finalVelocity.y, finalHorVelocity.z);
     }
 
     private void Jump()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (doubleJump)
+            hasSecondJump = true;
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
+            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
             if (wallRunning == 0)
                 rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
             else if (wallRunning == 1)
@@ -162,14 +188,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void DoubleJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+            rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
+            hasSecondJump = false;
+        }
+    }
+
     private void WallRun()
     {
-        if (!isGrounded() && Input.GetKey(KeyCode.D) && !disableRight && WallOnRight() && rb.velocity.y <= 5f)
+        if (!isGrounded() && Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.W) && !disableRight && WallOnRight() && rb.velocity.y <= 5f)
         {
             rb.velocity = new Vector3(rb.velocity.x, .2f, rb.velocity.z);
             wallRunning = 1;
         }
-        else if (!isGrounded() && Input.GetKey(KeyCode.A) && !disableLeft && WallOnLeft() && rb.velocity.y <= 5f)
+        else if (!isGrounded() && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W) && !disableLeft && WallOnLeft() && rb.velocity.y <= 5f)
         {
             rb.velocity = new Vector3(rb.velocity.x, .2f, rb.velocity.z);
             wallRunning = 2;
