@@ -21,19 +21,25 @@ public class PlayerController : MonoBehaviour
     public bool lowGravity;
     public bool SpeedBoost; 
     public bool doubleJump;
+    public bool slowTime;
 
     // Power Up variables
     public float lowGravityModifier;
     public float speedBoostModifier;
 
+    private CameraController cc;
     private Rigidbody rb;
     private Animator camAnim;
+    public bool freeCam;
     private float floorRaycastDistance; // how far the player can be off the ground and still jump
     private float wallRaycastDistance;
 
     private bool crouching;
     private bool running;
     private int wallRunning;
+    private int wallJumpDirection;
+    private float wallJumpTimer;
+    public float wantedAngle;
     private float playerControl;
 
     private bool inWind;
@@ -50,6 +56,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        cc = FindObjectOfType<CameraController>();
         rb = GetComponent<Rigidbody>();
         camAnim = transform.GetComponentInChildren<Animator>();
         floorRaycastDistance = 1.1f;
@@ -60,10 +67,28 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if ((isGrounded() || wallRunning != 0) && transform.localScale.y == 1)
+        if(slowTime)
+        {
+            Time.timeScale = 0.5f;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+
+        if (wallJumpTimer > 0)
+        {
+            wallJumpTimer -= Time.deltaTime;
+        }
+        else
+        {
+            wallJumpTimer = 0;
+        }
+
+        if ((isGrounded() || wallJumpDirection != 0) && transform.localScale.y == 1)
             Jump();
 
-        if (doubleJump && hasSecondJump && !isGrounded() && wallRunning == 0 && transform.localScale.y == 1)
+        if (doubleJump && hasSecondJump && !isGrounded() && wallJumpDirection == 0 && transform.localScale.y == 1)
             DoubleJump();
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -109,6 +134,9 @@ public class PlayerController : MonoBehaviour
         WallRun();
         Move();
 
+        if(!freeCam)
+            wantedAngle = cc.currentLookingPos.x;
+        transform.localRotation = Quaternion.AngleAxis(wantedAngle, transform.up);
         transform.rotation = new Quaternion(0, transform.rotation.y, 0, transform.rotation.w);
     }
 
@@ -169,16 +197,16 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-            if (wallRunning == 0)
+            if (wallJumpDirection == 0)
                 rb.AddForce(0, jumpForce, 0, ForceMode.Impulse);
-            else if (wallRunning == 1)
+            else if (wallJumpDirection == 1)
             {
                 rb.AddForce(0, jumpForce * .8f, 0, ForceMode.Impulse);
                 rb.AddForce(jumpForce * 2 * -transform.right, ForceMode.Impulse);
                 disableRight = true;
                 StartCoroutine(EnableRight());
             }
-            else if (wallRunning == 2)
+            else if (wallJumpDirection == 2)
             {
                 rb.AddForce(0, jumpForce * .8f, 0, ForceMode.Impulse);
                 rb.AddForce(jumpForce * 2 * transform.right, ForceMode.Impulse);
@@ -202,16 +230,32 @@ public class PlayerController : MonoBehaviour
     {
         if (!isGrounded() && Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.W) && !disableRight && WallOnRight() && rb.velocity.y <= 5f)
         {
-            rb.velocity = new Vector3(rb.velocity.x, .2f, rb.velocity.z);
+            rb.velocity = new Vector3(rb.velocity.x, -1f, rb.velocity.z);
             wallRunning = 1;
+            wallJumpDirection = 1;
+            wallJumpTimer = .25f;
+            freeCam = true;
+            transform.GetChild(0).transform.localRotation = Quaternion.AngleAxis(cc.currentLookingPos.x - wantedAngle, transform.up);
         }
         else if (!isGrounded() && Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.W) && !disableLeft && WallOnLeft() && rb.velocity.y <= 5f)
         {
-            rb.velocity = new Vector3(rb.velocity.x, .2f, rb.velocity.z);
+            rb.velocity = new Vector3(rb.velocity.x, -1f, rb.velocity.z);
             wallRunning = 2;
+            wallJumpDirection = 2;
+            wallJumpTimer = .3f;
+            freeCam = true;
+            transform.GetChild(0).transform.localRotation = Quaternion.AngleAxis(cc.currentLookingPos.x - wantedAngle, transform.up);
         }
         else
+        {
+            freeCam = false;
+            transform.GetChild(0).transform.rotation = new Quaternion(0, 0, 0, 0);
             wallRunning = 0;
+            if(wallJumpTimer == 0)
+            {
+                wallJumpDirection = 0;
+            }
+        }
 
         camAnim.SetInteger("Wall Run State", wallRunning);
     }
@@ -245,15 +289,31 @@ public class PlayerController : MonoBehaviour
 
     private bool WallOnRight()
     {
-        bool check1 = Physics.Raycast(new Vector3 (transform.position.x, transform.position.y + .5f, transform.position.z), transform.right, wallRaycastDistance);
+        RaycastHit hit;
+        bool check1 = Physics.Raycast(new Vector3 (transform.position.x, transform.position.y + .5f, transform.position.z), transform.right, out hit, wallRaycastDistance);
         bool check2 = Physics.Raycast(new Vector3(transform.position.x, transform.position.y - .5f, transform.position.z), transform.right, wallRaycastDistance);
+        if (check1)
+        {
+            wantedAngle = Vector3.Angle(hit.normal, -Vector3.right);
+            Vector3 cross = Vector3.Cross(hit.normal, -Vector3.right);
+            if (cross.y > 0)
+                wantedAngle *= -1;
+        }
         return check1 && check2;
     }
 
     private bool WallOnLeft()
     {
-        bool check1 = Physics.Raycast(new Vector3(transform.position.x, transform.position.y + .5f, transform.position.z), -transform.right, wallRaycastDistance);
+        RaycastHit hit;
+        bool check1 = Physics.Raycast(new Vector3(transform.position.x, transform.position.y + .5f, transform.position.z), -transform.right, out hit, wallRaycastDistance);
         bool check2 = Physics.Raycast(new Vector3(transform.position.x, transform.position.y - .5f, transform.position.z), -transform.right, wallRaycastDistance);
+        if (check1)
+        {
+            wantedAngle = Vector3.Angle(hit.normal, Vector3.right);
+            Vector3 cross = Vector3.Cross(hit.normal, Vector3.right);
+            if (cross.y > 0)
+                wantedAngle *= -1;
+        }
         return check1 && check2;
     }
 
