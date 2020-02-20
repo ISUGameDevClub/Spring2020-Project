@@ -7,12 +7,14 @@ public class CameraController : MonoBehaviour
     public float MouseSensetivity;
     public float smoothing;
 
-    private GameObject player;
+    private GameObject cr;
+    private PlayerController pc;
     private Vector2 smoothedVelocity;
-    private Vector2 currentLookingPos;
+    public Vector2 currentLookingPos;
     void Start()
     {
-        player = transform.parent.parent.gameObject;
+        cr = transform.parent.parent.gameObject;
+        pc = FindObjectOfType<PlayerController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -31,12 +33,20 @@ public class CameraController : MonoBehaviour
         smoothedVelocity.x = Mathf.Lerp(smoothedVelocity.x, inputValues.x, 1f / smoothing);
         smoothedVelocity.y = Mathf.Lerp(smoothedVelocity.y, inputValues.y, 1f / smoothing);
 
-        currentLookingPos.y = Mathf.Clamp(currentLookingPos.y, -80f, 80f);
 
         currentLookingPos += smoothedVelocity;
 
+        currentLookingPos.y = Mathf.Clamp(currentLookingPos.y, -80f, 80f);
+        currentLookingPos.x %= 360;
+
         transform.localRotation = Quaternion.AngleAxis(-currentLookingPos.y, Vector3.right);
-        player.transform.localRotation = Quaternion.AngleAxis(currentLookingPos.x, player.transform.up);
+        if (pc.freeCam)
+        {
+            cr.transform.localRotation = Quaternion.AngleAxis(currentLookingPos.x - pc.wantedAngle, transform.up);
+            cr.transform.rotation = new Quaternion(0, transform.rotation.y, 0, transform.rotation.w);
+        }
+        else
+            cr.transform.rotation = new Quaternion(0, 0, 0, 0);
     }
 
     private void OnGUI()
