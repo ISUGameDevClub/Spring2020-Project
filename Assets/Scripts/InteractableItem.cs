@@ -5,9 +5,11 @@ using UnityEngine;
 public class InteractableItem : MonoBehaviour
 {
     public int powerUp;
+
+    private bool active = true;
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Player")
+        if(other.tag == "Player" && active)
         {
             if (powerUp == 0)
             {
@@ -25,7 +27,16 @@ public class InteractableItem : MonoBehaviour
             else if (powerUp == 4)
                 other.GetComponent<PlayerController>().slowTime = true;
 
-            Destroy(gameObject);
+            active = false;
+            GetComponent<MeshRenderer>().enabled = false;
+            StartCoroutine(Respawn());
         }
+    }
+
+    IEnumerator Respawn()
+    {
+        yield return new WaitForSeconds(3);
+        GetComponent<MeshRenderer>().enabled = true;
+        active = true;
     }
 }
