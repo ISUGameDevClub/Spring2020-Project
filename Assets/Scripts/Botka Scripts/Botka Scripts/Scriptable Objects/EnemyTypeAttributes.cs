@@ -7,12 +7,14 @@ public class EnemyTypeAttributes : ScriptableObject
 {
     public enum AttackType
     {
-        Gun,Meele,None
+        Gun,Meele,None, NA
     }
 
    [SerializeField] private AttackType attackType;
    [SerializeField] private float damage;
-    [SerializeField]private float movementSpeedModifeier;
+    [SerializeField] private float maxHealth;
+    [SerializeField] [Range(0f, 10f)] private float velocityModiferier;
+    [SerializeField] [Range(0f, 1000f)] private float detectionRange;
 
 
     public AttackType getAttackType()
