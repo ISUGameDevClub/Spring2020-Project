@@ -11,11 +11,22 @@ public class AI : MonoBehaviour
 
     }
 
-   [SerializeField] private GameObject target;
+    public enum AIAttackType
+    {
+        Gun, Physical, None
+    }
+
+    [Header("Essentials")]
+
+    [SerializeField] private GameObject target;
     [SerializeField] private NavMeshAgent navMeshAgent;
+
     [Header("Enemy Attributes object data container")]
+
     [Tooltip("This object holds all of the data attributes for the script to read from. " )]
     [SerializeField] private EnemyTypeAttributes enemyAttributes;
+
+    [Header("Animation settings")]
 
     [SerializeField]private Animator animator;
 
@@ -25,6 +36,8 @@ public class AI : MonoBehaviour
     private bool interrupt; // variable determinnes if AI should halt current coroutine
 
     private bool activateAnimationUssage; // debug perpuses
+
+    private AIAttackType currentAttackExecution;
   
   
     
@@ -41,6 +54,7 @@ public class AI : MonoBehaviour
     public bool canMoveDebug;
     public bool canAttackDebug;
     public bool interruptedActive;
+    public float navMeshPathfindingSpeed;
 
     void Awake()
     {
@@ -107,6 +121,8 @@ public class AI : MonoBehaviour
             {
                 navMeshAgent.SetDestination(target.transform.position);
             }
+
+            
         }
         else
         {
@@ -119,20 +135,41 @@ public class AI : MonoBehaviour
 
     private void stopMovement()
     {
-        navMeshAgent.SetDestination(target.transform.position);
+        if (navMeshAgent != null)
+        {
+            if (navMeshAgent.isStopped == false)
+            {
+                navMeshAgent.acceleration = 0f;
+            }
+        }
 
     }
 
-
-    private IEnumerator executeAttack() // this should call the attack animation
+    private void resumeMovement()
     {
-        
+        if (navMeshAgent != null)
+        {
+            if (enemyAttributes != null)
+            {
+                // navMeshAgent.acceleration = enemyAttributes.getMovementSpeed;
+
+            }
+        }
+      
+    }
+
+
+    private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
+    {
+        currentAttackExecution = attackType;
         yield return new WaitForSeconds(0f); // replace this line
-        attackCoroutine = null;
+
+
+        attackCoroutine = null; // this must be last call
 
     }
 
-    private void dataValidation()
+    private void dataValidation() // in normal programing done through interface calsses, validates data before ussage
     {
         if (target == null)
         {
@@ -156,7 +193,8 @@ public class AI : MonoBehaviour
             if (gameObject.GetComponent<Animator>() != null) // checks its existance
             {
                 animator = gameObject.GetComponent<Animator>();
-                Debug.LogWarning("Found animator, animator is now fixed. Check inspector to see if this could be prevented next time").
+                activateAnimationUssage = true;
+                Debug.LogWarning("Found animator, animator is now fixed. Check inspector to see if this could be prevented next time");
             }
             else
             {
@@ -179,6 +217,7 @@ public class AI : MonoBehaviour
         canMoveDebug = canMove;
         canAttackDebug = canAttack;
         interruptedActive = interrupt;
+        navMeshPathfindingSpeed = navMeshAgent.speed;
     }
 
     private void OnDestroy()
@@ -192,11 +231,36 @@ public class AI : MonoBehaviour
     {
         // this makes sure that if the target and the target objects collider are on different hiearchy levels that it still will return true 
         //by getting the upmost parent and then comparing
-        if (other.transform.root.gameObject == target.transform.root.gameObject) 
+        if (other.transform.root.gameObject == target.transform.root.gameObject) // if we are doing shooting we need a seperate trigger collider on player for just range.
         {
-            if (attackCoroutine == null)
+            if (other.gameObject.tag == "RangeCollider") // this is for gun attacks
             {
-                attackCoroutine = StartCoroutine(executeAttack());
+                if (attackCoroutine == null) // checks to see if the ai is attacking already
+                {
+                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Gun));
+                }
+                else if (currentAttackExecution != AIAttackType.Gun) // an attack is happening but we ovveride it with neew attack. This can happen if a player is running into the enemies physical trigger range where shooting would not be effective.
+                {
+                    StopCoroutine(attackCoroutine);
+                    attackCoroutine = null;
+                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Gun));
+
+                }
+            }
+            else // this is for meele attack
+            {
+                if (attackCoroutine == null )
+                {
+                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack 
+                }
+                else if (currentAttackExecution != AIAttackType.Physical) // an attack is happening but we ovveride it with neew attack. This can happen if a player is running into the enemies physical trigger range where shooting would not be effective.
+                {
+                    StopCoroutine(attackCoroutine);
+                    attackCoroutine = null;
+                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack with differenct attack type
+
+                }
+
             }
 
         }
