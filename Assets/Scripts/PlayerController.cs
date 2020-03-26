@@ -19,17 +19,14 @@ public class PlayerController : MonoBehaviour
     public float airControl;
 
     // Power Ups
-    public bool lowGravity;
-    public bool SpeedBoost; 
-    public bool doubleJump;
-    public bool slowTime;
+    public float lowGravity;
+    public float SpeedBoost; 
+    public float doubleJump;
+    public float slowTime;
 
     // Power Up variables
     public float lowGravityModifier;
     public float speedBoostModifier;
-
-    public GameObject bullet;
-    public GameObject bulletSpawn;
 
     public Vector3 desiredScale;
 
@@ -76,9 +73,24 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (lowGravity > 0)
+            lowGravity -= Time.deltaTime;
+
+        if (SpeedBoost > 0)
+            SpeedBoost -= Time.deltaTime;
+
+        if (doubleJump > 0)
+            doubleJump -= Time.deltaTime;
+
+        if (slowTime > 0)
+            slowTime -= Time.deltaTime;
+
+
+
+
         if (!FindObjectOfType<PauseMenu>().gamePaused)
         {
-            if (slowTime)
+            if (slowTime > 0)
             {
                 Time.timeScale = 0.5f;
             }
@@ -100,7 +112,7 @@ public class PlayerController : MonoBehaviour
         if ((isGrounded() || wallJumpDirection != 0) && transform.localScale.y == desiredScale.y)
             Jump();
 
-        if (doubleJump && hasSecondJump && !isGrounded() && wallJumpDirection == 0 && transform.localScale.y == desiredScale.y)
+        if (doubleJump > 0 && hasSecondJump && !isGrounded() && wallJumpDirection == 0 && transform.localScale.y == desiredScale.y)
             DoubleJump();
 
         if (Input.GetKey(KeyCode.LeftControl))
@@ -112,13 +124,6 @@ public class PlayerController : MonoBehaviour
             transform.localScale = desiredScale;
         else if (transform.localScale.y < desiredScale.y * .55f)
             transform.localScale = new Vector3(desiredScale.x, desiredScale.y * .5f, desiredScale.z);
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            Bullet bull = Instantiate(bullet, bulletSpawn.transform).GetComponent<Bullet>();
-            bull.gameObject.transform.parent = null;
-            bull.gameObject.transform.localScale = new Vector3(.05f, .05f, .5f);
-        }
     }
 
     private void FixedUpdate()
@@ -150,7 +155,7 @@ public class PlayerController : MonoBehaviour
             gravity = grav * gravityScale * 3 * Vector3.up;
         }
 
-        if (lowGravity)
+        if (lowGravity > 0)
             gravity *= lowGravityModifier;
 
         rb.AddForce(gravity, ForceMode.Acceleration);
@@ -191,7 +196,7 @@ public class PlayerController : MonoBehaviour
         if (wallRunning != 0)
             finalVelocity *= (1 + wallRunningSpeedBoost);
 
-        if (SpeedBoost)
+        if (SpeedBoost > 0)
             finalVelocity *= (1 + speedBoostModifier);
 
         finalVelocity = new Vector3(finalVelocity.x, rb.velocity.y, finalVelocity.z);
@@ -217,7 +222,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (doubleJump)
+        if (doubleJump > 0)
             hasSecondJump = true;
 
         if (Input.GetButtonDown("Jump"))

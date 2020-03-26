@@ -191,7 +191,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1022563075}
+      - m_Target: {fileID: 0}
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
@@ -250,7 +250,7 @@ GameObject:
   - component: {fileID: 792465193}
   - component: {fileID: 792465192}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Transition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -419,7 +419,7 @@ GameObject:
   - component: {fileID: 1022563074}
   - component: {fileID: 1022563075}
   m_Layer: 0
-  m_Name: Scene Transition
+  m_Name: Title Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -449,11 +449,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1022563073}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d6aba5acebeae24ea1164d9283ff919, type: 3}
+  m_Script: {fileID: 11500000, guid: 33c81ea975251ed4c85e64952ea0a0a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   anim: {fileID: 792465192}
-  sceneName: Playground
   LockCursor: 0
 --- !u!1 &1158807221
 GameObject:
@@ -738,7 +737,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1278752144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -903,14 +902,14 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1022563075}
-        m_MethodName: FadeOut
-        m_Mode: 1
+        m_MethodName: LoadNewScene
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Playground
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2015924383

@@ -191,6 +191,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2016886956678705987}
   - component: {fileID: 2016886956678705985}
+  - component: {fileID: 8571193691119570340}
   - component: {fileID: 2016886956678705980}
   - component: {fileID: 2016886956678705981}
   - component: {fileID: 2016886956678705982}
@@ -246,12 +247,27 @@ MonoBehaviour:
   doubleJump: 0
   slowTime: 0
   lowGravityModifier: 0.4
-  speedBoostModifier: 0.3
-  bullet: {fileID: 9082029996726335750, guid: b9bb02cdd305ec448a7001f7ce83359b, type: 3}
-  bulletSpawn: {fileID: 2016886957317541267}
+  speedBoostModifier: 0.5
   desiredScale: {x: 1, y: 1, z: 1}
   wallRunning: 0
   wantedAngle: 0
+--- !u!114 &8571193691119570340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2016886956678705983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 384d43b80942b8c4abb5777711253063, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletGameObject: {fileID: 9082029996726335750, guid: b9bb02cdd305ec448a7001f7ce83359b,
+    type: 3}
+  bulletSpawn: {fileID: 2016886957317541267}
+  maxAmmo: 5
+  reloadTime: 1
 --- !u!33 &2016886956678705980
 MeshFilter:
   m_ObjectHideFlags: 0

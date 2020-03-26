@@ -20,6 +20,15 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(other.gameObject.tag == "Player")
+        {
+            // DEAL DAMAGE TO PLAYER
+        }
+        else if(other.gameObject.tag == "Enemy")
+        {
+            // DEAL DAMAGE TO ENEMY
+        }
+
         Destroy(gameObject);
     }
 
