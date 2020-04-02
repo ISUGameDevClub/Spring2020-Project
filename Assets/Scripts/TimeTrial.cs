@@ -8,7 +8,7 @@ public class TimeTrial : MonoBehaviour
     private float timer;
     private bool timerGoing;
     public Text text;
-
+    
     private void Update()
     {
         if (timerGoing)
