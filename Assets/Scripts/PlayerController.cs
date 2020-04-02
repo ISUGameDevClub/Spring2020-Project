@@ -53,6 +53,8 @@ public class PlayerController : MonoBehaviour
     private bool canStand;
 
     private bool hasSecondJump;
+    [Header("debug")]
+    public bool x;
 
     void Start()
     {
