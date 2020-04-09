@@ -5,16 +5,23 @@ using UnityEngine;
 public class ToxicGoo : MonoBehaviour
 {
     public int damage;
-    bool touchingPlayer;
+    public bool touchingPlayer;
     private Health playerHealth;
+    private PlayerController pc;
 
+    private void Start()
+    {
+        pc = FindObjectOfType<PlayerController>();
+        playerHealth = pc.gameObject.GetComponent<Health>();
+        StartCoroutine(InGoo());
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Player")
         {
             touchingPlayer = true;
-            other.gameObject.GetComponent<Health>();
+            pc.forcedWalk = true;
         }
     }
 
@@ -23,14 +30,23 @@ public class ToxicGoo : MonoBehaviour
         if (other.gameObject.tag == "Player")
         {
             touchingPlayer = false;
+            pc.forcedWalk = false;
         }
     }
 
-    private void Update()
+    IEnumerator InGoo()
     {
-        if (touchingPlayer)
+        while (true)
         {
-            playerHealth()
+            if (touchingPlayer)
+            {
+                playerHealth.recieveDamage(damage);
+                yield return new WaitForSeconds(.1f);
+            }
+            else
+            {
+                yield return new WaitForSeconds(.1f);
+            }
         }
     }
 }
