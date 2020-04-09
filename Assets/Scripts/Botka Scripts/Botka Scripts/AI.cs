@@ -20,6 +20,13 @@ public class AI : MonoBehaviour
     private const string ANIMATOR_STATE_GUN_THREE = "GunThree";
 
 
+    private GameObject weapon;
+
+    private Gun gun;
+
+
+
+
     // private Gun gun;
 
     public enum EntityStatus
@@ -88,6 +95,9 @@ public class AI : MonoBehaviour
         canMove = true;
         navMeshAgent.destination = target.transform.position;
         dataValidation();
+        gun = null;
+        if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
+        { }
         
 
         
@@ -185,19 +195,6 @@ public class AI : MonoBehaviour
       
     }
 
-
-    private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
-    {
-        currentAttackExecution = attackType;
-        yield return new WaitForSeconds(0f); // replace this line
-
-
-        attackCoroutine = null; // this must be last call
-
-    }
-
-
- 
     public IEnumerator timeOutDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -241,8 +238,6 @@ public class AI : MonoBehaviour
             activateAnimationUssage = true;
         }
 
-        
-
     }
 
     private void updateVariables() // mostly for debug variables
@@ -258,12 +253,40 @@ public class AI : MonoBehaviour
     [ContextMenu("Activate Attack")]
     public IEnumerator attack(AIAttackType attackType)
     {
-
         yield return new WaitUntil(() => canAttack == true);
-
         StartCoroutine(executeAttack(attackType));
 
     }
+
+
+    private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
+    {
+        currentAttackExecution = attackType;
+        switch (currentAttackExecution)
+        {
+            case AIAttackType.Gun:
+                if (gun != null)
+                {
+                    gun.fire();
+                }
+                break;
+            case AIAttackType.Physical:
+                break;
+            case AIAttackType.None:
+                Debug.LogError("attempted to attack woth no weapon. This should not have happened");
+                break;
+          
+        }
+
+
+
+        yield return new WaitForSeconds(0f); // replace this line
+
+
+        attackCoroutine = null; // this must be last call
+
+    }
+
 
 
     [ContextMenu("Cancel Attack")]
@@ -277,7 +300,28 @@ public class AI : MonoBehaviour
         
     }
 
-   
+
+    public bool isEquippedWeaponGun()
+    {
+        return false;
+    }
+
+    public bool isEquippedWeaponMeele()
+    {
+        return false;
+    }
+
+    public bool hasWeapon()
+    {
+        if (weapon != null)
+        {
+            return true;
+        }
+
+        return false; // no need for else as return stops statement before reaching this
+    }
+
+
 
     private void OnDestroy()
     {
