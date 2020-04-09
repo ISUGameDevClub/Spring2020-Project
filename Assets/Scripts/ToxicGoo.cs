@@ -5,7 +5,7 @@ using UnityEngine;
 public class ToxicGoo : MonoBehaviour
 {
     public int damage;
-    public bool touchingPlayer;
+    private bool touchingPlayer;
     private Health playerHealth;
     private PlayerController pc;
 
