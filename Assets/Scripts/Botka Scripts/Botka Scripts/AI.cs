@@ -93,7 +93,11 @@ public class AI : MonoBehaviour
     {
         canAttack = true; // ensures that movement code is not execute until the first frame
         canMove = true;
-        navMeshAgent.destination = target.transform.position;
+
+        navMeshAgent.SetDestination(target.transform.position);
+        navMeshAgent.updatePosition = true;
+        navMeshAgent.updateRotation = true;
+        
         dataValidation();
         gun = null;
         if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
@@ -156,9 +160,11 @@ public class AI : MonoBehaviour
                 attackCoroutine = StartCoroutine(attack(attackType));
             }
 
-            gameObject.transform.rotation = Quaternion.LookRotation(transform.position);
-            // add aim  variance
+            Vector3 relativePos = target.transform.position - transform.position;
+            navMeshAgent.transform.rotation = Quaternion.LookRotation(relativePos);
             
+            // add aim  variance
+
         }
         else
         {
@@ -267,7 +273,7 @@ public class AI : MonoBehaviour
             case AIAttackType.Gun:
                 if (gun != null)
                 {
-                    gun.fire();
+                    gun.Fire();
                 }
                 break;
             case AIAttackType.Physical:

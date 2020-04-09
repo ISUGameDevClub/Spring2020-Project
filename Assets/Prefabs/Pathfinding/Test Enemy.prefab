@@ -13,8 +13,9 @@ GameObject:
   - component: {fileID: 6308707351597652123}
   - component: {fileID: 6308707351597652120}
   - component: {fileID: 6308707351597652121}
-  - component: {fileID: 6308707351597652118}
   - component: {fileID: 6308707351597652119}
+  - component: {fileID: 2477350656261876321}
+  - component: {fileID: 3392438436953079477}
   m_Layer: 0
   m_Name: Test Enemy
   m_TagString: Untagged
@@ -110,28 +111,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6308707351597652118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6308707351597652116}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a9f9023060488c4d90f9cf05c5e5c2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  navMeshAgent: {fileID: 6308707351597652119}
-  enemyAttributes: {fileID: 0}
-  animator: {fileID: 0}
-  entityStatusDubug: 0
-  entityLocation: {x: 0, y: 0, z: 0}
-  canMoveDebug: 0
-  canAttackDebug: 0
-  interruptedActive: 0
-  navMeshPathfindingSpeed: 0
 --- !u!195 &6308707351597652119
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -154,3 +133,38 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &2477350656261876321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6308707351597652116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 873d5080b2751b7499c8b971df8e300a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  navMeshAgent: {fileID: 6308707351597652119}
+  attackType: 0
+  enemyAttributes: {fileID: 0}
+  animator: {fileID: 0}
+  entityStatusDubug: 0
+  entityLocation: {x: 0, y: 0, z: 0}
+  canMoveDebug: 0
+  canAttackDebug: 0
+  interruptedActive: 0
+  navMeshPathfindingSpeed: 0
+--- !u!114 &3392438436953079477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6308707351597652116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16f21cecd16dd4c459d47a8e50c4f249, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
