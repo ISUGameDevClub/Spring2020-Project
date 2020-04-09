@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+
+[RequireComponent(typeof(Enemy), typeof(Collider))]
 public class AI : MonoBehaviour
 {
+    public const string TAG = "AI";
+    // private Gun gun;
+
     public enum EntityStatus
     {
         None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
@@ -20,36 +25,36 @@ public class AI : MonoBehaviour
 
     [SerializeField] private GameObject target;
     [SerializeField] private NavMeshAgent navMeshAgent;
+    [SerializeField] private AIAttackType attackType;
 
     [Header("Enemy Attributes object data container")]
 
-    [Tooltip("This object holds all of the data attributes for the script to read from. " )]
+    [Tooltip("This object holds all of the data attributes for the script to read from. ")]
     [SerializeField] private EnemyTypeAttributes enemyAttributes;
 
     [Header("Animation settings")]
 
-    [SerializeField]private Animator animator;
+    [SerializeField] private Animator animator;
 
     private EntityStatus entityStatus;
     private bool canMove; //variable determines if AI is locked in position
-    private bool canAttack; 
+    private bool canAttack;
     private bool interrupt; // variable determinnes if AI should halt current coroutine
 
     private bool activateAnimationUssage; // debug perpuses
 
     private AIAttackType currentAttackExecution;
-  
-  
-    
 
     private Coroutine attackCoroutine; // multithreaded coroutine that execute parrellel to the update method when called. Must be called ussualy only once per execution
 
-    [Header("Movement Options")] 
-    [Range(0f,10f)] private float velocityModiferier;
-  [Range(0f, 1000f)] private float detectionRange;
+
+
+    [Header("Movement Options")]
+    [Range(0f, 10f)] private float velocityModiferier;
+    [Range(0f, 1000f)] private float detectionRange;
 
     [Header("Debug- DO NOT SET")]
-   public EntityStatus entityStatusDubug;
+    public EntityStatus entityStatusDubug;
     public Vector3 entityLocation;
     public bool canMoveDebug;
     public bool canAttackDebug;
@@ -61,7 +66,8 @@ public class AI : MonoBehaviour
         canAttack = false;
         canMove = false;
         interrupt = false;
-        
+
+
     }
     // Start is called before the first frame update
     void Start()
@@ -70,13 +76,13 @@ public class AI : MonoBehaviour
         canMove = true;
         navMeshAgent.destination = target.transform.position;
         dataValidation();
-        
 
-        
+
+
     }
 
     // Update is called once per frame
-    void fixedUpdate()
+    void FixedUpdate()
     {
         dataValidation(); // first call
 
@@ -89,7 +95,7 @@ public class AI : MonoBehaviour
             }
 
             // stop movement
-   
+
         }
 
         if (canMove)
@@ -99,12 +105,13 @@ public class AI : MonoBehaviour
                 if (checkIfInRangeOfTarget())
                 {
                     moveTowardsTarget();
+
                 }
             }
         }
 
         updateVariables(); // last call
-        
+
     }
 
     private bool checkIfInRangeOfTarget()
@@ -113,6 +120,7 @@ public class AI : MonoBehaviour
 
     }
 
+    [ContextMenu("Activate pathfinding to target")]
     private void moveTowardsTarget()
     {
         if (target != null)
@@ -121,8 +129,11 @@ public class AI : MonoBehaviour
             {
                 navMeshAgent.SetDestination(target.transform.position);
             }
+            if (attackCoroutine == null)
+            {
+                attackCoroutine = StartCoroutine(attack(attackType));
+            }
 
-            
         }
         else
         {
@@ -133,6 +144,7 @@ public class AI : MonoBehaviour
 
     }
 
+    [ContextMenu("Stop Movement")]
     private void stopMovement()
     {
         if (navMeshAgent != null)
@@ -155,7 +167,7 @@ public class AI : MonoBehaviour
 
             }
         }
-      
+
     }
 
 
@@ -166,6 +178,14 @@ public class AI : MonoBehaviour
 
 
         attackCoroutine = null; // this must be last call
+
+    }
+
+
+
+    public IEnumerator timeOutDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
 
     }
 
@@ -206,7 +226,7 @@ public class AI : MonoBehaviour
             activateAnimationUssage = true;
         }
 
-        
+
 
     }
 
@@ -220,11 +240,35 @@ public class AI : MonoBehaviour
         navMeshPathfindingSpeed = navMeshAgent.speed;
     }
 
+    [ContextMenu("Activate Attack")]
+    public IEnumerator attack(AIAttackType attackType)
+    {
+
+        yield return new WaitUntil(() => canAttack == true);
+
+        StartCoroutine(executeAttack(attackType));
+
+    }
+
+
+    [ContextMenu("Cancel Attack")]
+    private void cancelAttack()
+    {
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+
+    }
+
+
+
     private void OnDestroy()
     {
         StopAllCoroutines();
         Debug.Log(gameObject.name + " was destroyed");
-        
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -249,7 +293,7 @@ public class AI : MonoBehaviour
             }
             else // this is for meele attack
             {
-                if (attackCoroutine == null )
+                if (attackCoroutine == null)
                 {
                     attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack 
                 }
@@ -268,7 +312,7 @@ public class AI : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        
+
     }
 
     //setters and getters here
