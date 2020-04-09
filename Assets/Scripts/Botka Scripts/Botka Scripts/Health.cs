@@ -163,11 +163,11 @@ public class Health : MonoBehaviour
     }
     private void OnDestroy() // is called on destroy
     {
-<<<<<<< HEAD
+
         Debug.LogWarning(gameObject.transform.root.name + "was Destroyed");
-=======
-        Debug.LogWarning(gameObject.transform.parent.root.name + "was Destroyed");
->>>>>>> 95f81036e72c99f7e409aaff707505439d26d29a
+
+
+
     }
 
     private void debugLogMessages()
