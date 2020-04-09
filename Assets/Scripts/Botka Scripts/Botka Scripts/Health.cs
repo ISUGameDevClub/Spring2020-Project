@@ -4,6 +4,7 @@ using UnityEngine;
 
 
 // @Author Jake Botka - Programming Team
+
 public class Health : MonoBehaviour
 {
     // @Author Jake Botka - Programming Team
@@ -162,7 +163,7 @@ public class Health : MonoBehaviour
     }
     private void OnDestroy() // is called on destroy
     {
-        Debug.LogWarning(gameObject.transform.parent.name + "was Destroyed");
+        Debug.LogWarning(gameObject.transform.root.name + "was Destroyed");
     }
 
     private void debugLogMessages()

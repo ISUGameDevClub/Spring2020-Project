@@ -209,6 +209,7 @@ GameObject:
   - component: {fileID: 644948472}
   - component: {fileID: 644948471}
   - component: {fileID: 644948470}
+  - component: {fileID: 644948477}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -252,13 +253,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 875744580}
   navMeshAgent: {fileID: 644948470}
-  velocityModiferier: 0
-  detectionRange: 0
+  enemyAttributes: {fileID: 0}
+  animator: {fileID: 0}
   entityStatusDubug: 0
   entityLocation: {x: 0, y: 0, z: 0}
   canMoveDebug: 0
   canAttackDebug: 0
   interruptedActive: 0
+  navMeshPathfindingSpeed: 0
 --- !u!54 &644948472
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -347,6 +349,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &644948477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644948469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16f21cecd16dd4c459d47a8e50c4f249, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &875744580
 GameObject:
   m_ObjectHideFlags: 0

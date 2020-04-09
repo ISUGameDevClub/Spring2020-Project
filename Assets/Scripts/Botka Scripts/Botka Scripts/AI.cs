@@ -3,8 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+
+[RequireComponent(typeof(Enemy), typeof(Collider))]
 public class AI : MonoBehaviour
 {
+    public const string TAG = "AI";
+
+    private const string ANIMATOR_STATE_IDLE = "idle";
+    private const string ANIMATOR_STATE_WALKING = "walking";
+    private const string ANIMATOR_STATE_RUNNING = "running";
+    private const string ANIMATOR_STATE_MEELE_ONE = "MeeleOne";
+    private const string ANIMATOR_STATE_MEELE_TWO = "MeeleTwo";
+    private const string ANIMATOR_STATE_MEELE_THREE = "MeeleThree";
+    private const string ANIMATOR_STATE_GUN_ONE = "GunOne";
+    private const string ANIMATOR_STATE_GUN_TWO = "GunTwo";
+    private const string ANIMATOR_STATE_GUN_THREE = "GunThree";
+
+
+    // private Gun gun;
+
     public enum EntityStatus
     {
         None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
@@ -20,6 +37,7 @@ public class AI : MonoBehaviour
 
     [SerializeField] private GameObject target;
     [SerializeField] private NavMeshAgent navMeshAgent;
+    [SerializeField] private AIAttackType attackType;
 
     [Header("Enemy Attributes object data container")]
 
@@ -39,10 +57,9 @@ public class AI : MonoBehaviour
 
     private AIAttackType currentAttackExecution;
   
-  
-    
-
     private Coroutine attackCoroutine; // multithreaded coroutine that execute parrellel to the update method when called. Must be called ussualy only once per execution
+    
+  
 
     [Header("Movement Options")] 
     [Range(0f,10f)] private float velocityModiferier;
@@ -62,6 +79,7 @@ public class AI : MonoBehaviour
         canMove = false;
         interrupt = false;
         
+        
     }
     // Start is called before the first frame update
     void Start()
@@ -76,7 +94,7 @@ public class AI : MonoBehaviour
     }
 
     // Update is called once per frame
-    void fixedUpdate()
+    void FixedUpdate()
     {
         dataValidation(); // first call
 
@@ -99,6 +117,7 @@ public class AI : MonoBehaviour
                 if (checkIfInRangeOfTarget())
                 {
                     moveTowardsTarget();
+                   
                 }
             }
         }
@@ -113,6 +132,7 @@ public class AI : MonoBehaviour
 
     }
 
+    [ContextMenu("Activate pathfinding to target")]
     private void moveTowardsTarget()
     {
         if (target != null)
@@ -121,7 +141,13 @@ public class AI : MonoBehaviour
             {
                 navMeshAgent.SetDestination(target.transform.position);
             }
+            if (attackCoroutine == null)
+            {
+                attackCoroutine = StartCoroutine(attack(attackType));
+            }
 
+            gameObject.transform.rotation = Quaternion.LookRotation(transform.position);
+            // add aim  variance
             
         }
         else
@@ -133,6 +159,7 @@ public class AI : MonoBehaviour
 
     }
 
+    [ContextMenu("Stop Movement")]
     private void stopMovement()
     {
         if (navMeshAgent != null)
@@ -166,6 +193,14 @@ public class AI : MonoBehaviour
 
 
         attackCoroutine = null; // this must be last call
+
+    }
+
+
+ 
+    public IEnumerator timeOutDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
 
     }
 
@@ -219,6 +254,30 @@ public class AI : MonoBehaviour
         interruptedActive = interrupt;
         navMeshPathfindingSpeed = navMeshAgent.speed;
     }
+
+    [ContextMenu("Activate Attack")]
+    public IEnumerator attack(AIAttackType attackType)
+    {
+
+        yield return new WaitUntil(() => canAttack == true);
+
+        StartCoroutine(executeAttack(attackType));
+
+    }
+
+
+    [ContextMenu("Cancel Attack")]
+    private void cancelAttack()
+    {
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        
+    }
+
+   
 
     private void OnDestroy()
     {
