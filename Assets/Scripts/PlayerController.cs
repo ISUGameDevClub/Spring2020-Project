@@ -330,7 +330,7 @@ public class PlayerController : MonoBehaviour
         canStand = true;
     }
 
-    private bool isGrounded()
+    public bool isGrounded()
     {
         return Physics.Raycast(transform.position, Vector3.down, floorRaycastDistance);
     }
