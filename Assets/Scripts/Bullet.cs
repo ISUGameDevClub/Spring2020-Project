@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour
         }
         else if(other.gameObject.tag == "Enemy")
         {
-            // DEAL DAMAGE TO ENEMY
+            other.gameObject.GetComponent<Health>().recieveDamage(damage);
         }
 
         Destroy(gameObject);

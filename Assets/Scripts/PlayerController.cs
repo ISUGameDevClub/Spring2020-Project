@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
 
     private float grav = -9.81f;
 
+    public  bool forcedWalk;
     private bool disableRight;
     private bool disableLeft;
     private bool canStand;
@@ -117,7 +118,7 @@ public class PlayerController : MonoBehaviour
         if (doubleJump > 0 && hasSecondJump && !isGrounded() && wallJumpDirection == 0 && transform.localScale.y == desiredScale.y)
             DoubleJump();
 
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl) || forcedWalk)
             running = false;
         else
             running = true;
@@ -143,6 +144,8 @@ public class PlayerController : MonoBehaviour
         }
         else if (crouching && !Input.GetButton("Slide") && isGrounded() && NoObjectAbove() && canStand)
             crouching = false;
+
+        //This is where I well implement an air dash method
         else if (!isGrounded())
             crouching = false;
 
