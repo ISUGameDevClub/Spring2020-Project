@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
 
     private float grav = -9.81f;
 
+    public  bool forcedWalk;
     private bool disableRight;
     private bool disableLeft;
     private bool canStand;
@@ -115,7 +116,7 @@ public class PlayerController : MonoBehaviour
         if (doubleJump > 0 && hasSecondJump && !isGrounded() && wallJumpDirection == 0 && transform.localScale.y == desiredScale.y)
             DoubleJump();
 
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl) || forcedWalk)
             running = false;
         else
             running = true;

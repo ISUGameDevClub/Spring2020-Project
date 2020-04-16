@@ -135,9 +135,9 @@ public class Health : MonoBehaviour
     public void recieveDamage(float damage) // this should be called either directly or via gameobject.sendMessage("recieveDamage", float damage) from external script;
     {
         currentHealth -= damage;
-        if (currentHealth <= 0 && OverideDestroyFunctions != true) // if health is zero and override is false then destroy
+        if (currentHealth <= 0f && OverideDestroyFunctions != true) // if health is zero and override is false then destroy
         {
-            Destroy(gameObject.transform.parent.gameObject); // Destroys gameobject
+            Destroy(gameObject.transform.root.gameObject); // Destroys gameobject
             Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
 
         }
@@ -162,7 +162,7 @@ public class Health : MonoBehaviour
     }
     private void OnDestroy() // is called on destroy
     {
-        Debug.LogWarning(gameObject.transform.parent.name + "was Destroyed");
+        Debug.LogWarning(gameObject.transform.parent.root.name + "was Destroyed");
     }
 
     private void debugLogMessages()

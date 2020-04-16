@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 1314160027431198507}
   - component: {fileID: 1556417985375522241}
   - component: {fileID: 114553047040792648}
+  - component: {fileID: 114346190893305364}
+  - component: {fileID: 201350801962080801}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -44,7 +46,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb3c8261c8f3d948a1cab13bee8ee2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aaaaa: 0
+  spawnerSystemType: 0
+  activationSpawnerSubSystem: {fileID: 0}
+  timeRepeatingSubSystem: {fileID: 0}
+  waveBasedSystem: {fileID: 0}
+  error: 0
 --- !u!114 &114553047040792648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,3 +69,34 @@ MonoBehaviour:
   parentType: 0
   currentFillPercent: 0
   currentHealth: 0
+--- !u!114 &114346190893305364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 280014749494033066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27a39dd1e5604fd44bc206615f61b984, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnedObject: {fileID: 0}
+  objectToActivatetrigger: {fileID: 0}
+--- !u!114 &201350801962080801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 280014749494033066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbb3c8261c8f3d948a1cab13bee8ee2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnerSystemType: 0
+  activationSpawnerSubSystem: {fileID: 0}
+  timeRepeatingSubSystem: {fileID: 0}
+  waveBasedSystem: {fileID: 0}
+  error: 0
