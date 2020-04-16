@@ -251,6 +251,9 @@ MonoBehaviour:
   desiredScale: {x: 1, y: 1, z: 1}
   wallRunning: 0
   wantedAngle: 0
+  forcedWalk: 0
+  x: 0
+  airDashCDTime: 3
 --- !u!114 &8571193691119570340
 MonoBehaviour:
   m_ObjectHideFlags: 0

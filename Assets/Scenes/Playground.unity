@@ -3895,6 +3895,8 @@ MonoBehaviour:
   wallRunning: 0
   wantedAngle: 0
   forcedWalk: 0
+  x: 0
+  airDashCDTime: 3
 --- !u!114 &1610254147
 MonoBehaviour:
   m_ObjectHideFlags: 0

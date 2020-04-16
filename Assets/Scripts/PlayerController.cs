@@ -62,6 +62,9 @@ public class PlayerController : MonoBehaviour
     [Header("debug")]
     public bool x;
 
+    private bool airDashCD;
+    public float airDashCDTime = 2f;
+
     void Start()
     {
         cc = FindObjectOfType<CameraController>();
@@ -146,8 +149,9 @@ public class PlayerController : MonoBehaviour
             crouching = false;
 
         //This is where I well implement an air dash method
-        else if (!isGrounded())
-            crouching = false;
+        else if (!isGrounded() && Input.GetButton("Slide")&&!airDashCD)
+            AirDash();
+            
 
         if (!crouching)
         {
@@ -400,5 +404,37 @@ public class PlayerController : MonoBehaviour
         inWind = false;
         windDirection = Vector3.zero;
         windPower = 0;
+    }
+
+    public void AirDash()
+    {
+        if (!airDashCD)
+        {
+        airDashCD = true;
+        StartCoroutine(AirDashCoroutine());
+        }
+    }
+
+    IEnumerator AirDashCoroutine()
+    {
+        if (Input.GetAxisRaw("Horizontal") < 0)
+        {
+            rb.AddForce(jumpForce * 2f * -transform.right, ForceMode.Impulse);
+        }
+        else if(Input.GetAxisRaw("Horizontal") > 0)
+        {
+            rb.AddForce(jumpForce * 2f * transform.right, ForceMode.Impulse);
+        }
+        else if (Input.GetAxisRaw("Vertical") < 0)
+        {
+            rb.AddForce(jumpForce * 1.5f * -transform.forward, ForceMode.Impulse);
+        }
+        else if (Input.GetAxisRaw("Vertical") > 0)
+        {
+            rb.AddForce(jumpForce * 1.5f * transform.forward, ForceMode.Impulse);
+        }
+        
+        yield return new WaitForSeconds(airDashCDTime);
+        airDashCD = false;
     }
 }
