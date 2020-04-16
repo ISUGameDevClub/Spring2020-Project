@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AI), typeof(Collider))]
 public class Enemy : MonoBehaviour
 {
     // Start is called before the first frame update

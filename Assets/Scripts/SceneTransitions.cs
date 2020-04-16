@@ -33,7 +33,12 @@ public class SceneTransitions : MonoBehaviour
     IEnumerator WaitHalfSecond(string sceneName)
     {
         yield return new WaitForSeconds(.5f);
-        SceneManager.LoadScene(sceneName);
+        if (sceneName != "current")
+        {
+            SceneManager.LoadScene(sceneName);
+        }
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void QuitGame()

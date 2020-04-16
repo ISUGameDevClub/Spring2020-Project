@@ -8,6 +8,25 @@ using UnityEngine.AI;
 public class AI : MonoBehaviour
 {
     public const string TAG = "AI";
+
+    private const string ANIMATOR_STATE_IDLE = "idle";
+    private const string ANIMATOR_STATE_WALKING = "walking";
+    private const string ANIMATOR_STATE_RUNNING = "running";
+    private const string ANIMATOR_STATE_MEELE_ONE = "MeeleOne";
+    private const string ANIMATOR_STATE_MEELE_TWO = "MeeleTwo";
+    private const string ANIMATOR_STATE_MEELE_THREE = "MeeleThree";
+    private const string ANIMATOR_STATE_GUN_ONE = "GunOne";
+    private const string ANIMATOR_STATE_GUN_TWO = "GunTwo";
+    private const string ANIMATOR_STATE_GUN_THREE = "GunThree";
+
+
+    private GameObject weapon;
+
+    private Gun gun;
+
+
+
+
     // private Gun gun;
 
     public enum EntityStatus
@@ -29,32 +48,32 @@ public class AI : MonoBehaviour
 
     [Header("Enemy Attributes object data container")]
 
-    [Tooltip("This object holds all of the data attributes for the script to read from. ")]
+    [Tooltip("This object holds all of the data attributes for the script to read from. " )]
     [SerializeField] private EnemyTypeAttributes enemyAttributes;
 
     [Header("Animation settings")]
 
-    [SerializeField] private Animator animator;
+    [SerializeField]private Animator animator;
 
     private EntityStatus entityStatus;
     private bool canMove; //variable determines if AI is locked in position
-    private bool canAttack;
+    private bool canAttack; 
     private bool interrupt; // variable determinnes if AI should halt current coroutine
 
     private bool activateAnimationUssage; // debug perpuses
 
     private AIAttackType currentAttackExecution;
-
+  
     private Coroutine attackCoroutine; // multithreaded coroutine that execute parrellel to the update method when called. Must be called ussualy only once per execution
+    
+  
 
-
-
-    [Header("Movement Options")]
-    [Range(0f, 10f)] private float velocityModiferier;
-    [Range(0f, 1000f)] private float detectionRange;
+    [Header("Movement Options")] 
+    [Range(0f,10f)] private float velocityModiferier;
+  [Range(0f, 1000f)] private float detectionRange;
 
     [Header("Debug- DO NOT SET")]
-    public EntityStatus entityStatusDubug;
+   public EntityStatus entityStatusDubug;
     public Vector3 entityLocation;
     public bool canMoveDebug;
     public bool canAttackDebug;
@@ -66,8 +85,8 @@ public class AI : MonoBehaviour
         canAttack = false;
         canMove = false;
         interrupt = false;
-
-
+        
+        
     }
     // Start is called before the first frame update
     void Start()
@@ -76,9 +95,12 @@ public class AI : MonoBehaviour
         canMove = true;
         navMeshAgent.destination = target.transform.position;
         dataValidation();
+        gun = null;
+        if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
+        { }
+        
 
-
-
+        
     }
 
     // Update is called once per frame
@@ -95,7 +117,7 @@ public class AI : MonoBehaviour
             }
 
             // stop movement
-
+   
         }
 
         if (canMove)
@@ -105,13 +127,13 @@ public class AI : MonoBehaviour
                 if (checkIfInRangeOfTarget())
                 {
                     moveTowardsTarget();
-
+                   
                 }
             }
         }
 
         updateVariables(); // last call
-
+        
     }
 
     private bool checkIfInRangeOfTarget()
@@ -134,6 +156,9 @@ public class AI : MonoBehaviour
                 attackCoroutine = StartCoroutine(attack(attackType));
             }
 
+            gameObject.transform.rotation = Quaternion.LookRotation(transform.position);
+            // add aim  variance
+            
         }
         else
         {
@@ -167,21 +192,8 @@ public class AI : MonoBehaviour
 
             }
         }
-
+      
     }
-
-
-    private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
-    {
-        currentAttackExecution = attackType;
-        yield return new WaitForSeconds(0f); // replace this line
-
-
-        attackCoroutine = null; // this must be last call
-
-    }
-
-
 
     public IEnumerator timeOutDelay(float delay)
     {
@@ -226,8 +238,6 @@ public class AI : MonoBehaviour
             activateAnimationUssage = true;
         }
 
-
-
     }
 
     private void updateVariables() // mostly for debug variables
@@ -243,12 +253,40 @@ public class AI : MonoBehaviour
     [ContextMenu("Activate Attack")]
     public IEnumerator attack(AIAttackType attackType)
     {
-
         yield return new WaitUntil(() => canAttack == true);
-
         StartCoroutine(executeAttack(attackType));
 
     }
+
+
+    private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
+    {
+        currentAttackExecution = attackType;
+        switch (currentAttackExecution)
+        {
+            case AIAttackType.Gun:
+                if (gun != null)
+                {
+                    gun.Fire();
+                }
+                break;
+            case AIAttackType.Physical:
+                break;
+            case AIAttackType.None:
+                Debug.LogError("attempted to attack woth no weapon. This should not have happened");
+                break;
+          
+        }
+
+
+
+        yield return new WaitForSeconds(0f); // replace this line
+
+
+        attackCoroutine = null; // this must be last call
+
+    }
+
 
 
     [ContextMenu("Cancel Attack")]
@@ -259,7 +297,28 @@ public class AI : MonoBehaviour
             StopCoroutine(attackCoroutine);
             attackCoroutine = null;
         }
+        
+    }
 
+
+    public bool isEquippedWeaponGun()
+    {
+        return false;
+    }
+
+    public bool isEquippedWeaponMeele()
+    {
+        return false;
+    }
+
+    public bool hasWeapon()
+    {
+        if (weapon != null)
+        {
+            return true;
+        }
+
+        return false; // no need for else as return stops statement before reaching this
     }
 
 
@@ -268,7 +327,7 @@ public class AI : MonoBehaviour
     {
         StopAllCoroutines();
         Debug.Log(gameObject.name + " was destroyed");
-
+        
     }
 
     private void OnTriggerEnter(Collider other)
@@ -293,7 +352,7 @@ public class AI : MonoBehaviour
             }
             else // this is for meele attack
             {
-                if (attackCoroutine == null)
+                if (attackCoroutine == null )
                 {
                     attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack 
                 }
@@ -312,7 +371,7 @@ public class AI : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-
+        
     }
 
     //setters and getters here
