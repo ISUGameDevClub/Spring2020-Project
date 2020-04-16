@@ -4,6 +4,7 @@ using UnityEngine;
 
 
 // @Author Jake Botka - Programming Team
+
 public class Health : MonoBehaviour
 {
     // @Author Jake Botka - Programming Team
@@ -110,8 +111,15 @@ public class Health : MonoBehaviour
     {
         if (currentHealth <= 0f && OverideDestroyFunctions != true) // if health is zero and override is false then destroy
         {
-            Destroy(gameObject.transform.parent.gameObject); // Destroys gameobject
-            Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
+            if (gameObject.tag == "Player")
+            {
+                FindObjectOfType<SceneTransitions>().LoadNewScene("current");
+            }
+            else
+            {
+                Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
+                Destroy(gameObject.transform.root.gameObject); // Destroys gameobject
+            }
 
         }
 
@@ -137,8 +145,15 @@ public class Health : MonoBehaviour
         currentHealth -= damage;
         if (currentHealth <= 0f && OverideDestroyFunctions != true) // if health is zero and override is false then destroy
         {
-            Destroy(gameObject.transform.root.gameObject); // Destroys gameobject
-            Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
+            if(gameObject.tag == "Player")
+            {
+                FindObjectOfType<SceneTransitions>().LoadNewScene("current");
+            }
+            else
+            {
+                Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
+                Destroy(gameObject.transform.root.gameObject); // Destroys gameobject
+            }
 
         }
 
@@ -162,7 +177,11 @@ public class Health : MonoBehaviour
     }
     private void OnDestroy() // is called on destroy
     {
-        Debug.LogWarning(gameObject.transform.parent.root.name + "was Destroyed");
+
+        Debug.LogWarning(gameObject.transform.root.name + "was Destroyed");
+
+
+
     }
 
     private void debugLogMessages()
