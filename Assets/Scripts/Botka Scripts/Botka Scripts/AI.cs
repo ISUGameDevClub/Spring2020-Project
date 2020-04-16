@@ -21,6 +21,7 @@ public class AI : MonoBehaviour
 
 
     private GameObject weapon;
+    public float stoppingDistance;
 
     private Gun gun;
 
@@ -91,7 +92,7 @@ public class AI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        canAttack = true; // ensures that movement code is not execute until the first frame
+        
         canMove = true;
 
         navMeshAgent.SetDestination(target.transform.position);
@@ -142,7 +143,8 @@ public class AI : MonoBehaviour
 
     private bool checkIfInRangeOfTarget()
     {
-        return true;
+      
+            return true;
 
     }
 
@@ -151,6 +153,7 @@ public class AI : MonoBehaviour
     {
         if (target != null)
         {
+
             if (navMeshAgent.destination != target.transform.position)
             {
                 navMeshAgent.SetDestination(target.transform.position);
@@ -160,7 +163,13 @@ public class AI : MonoBehaviour
                 attackCoroutine = StartCoroutine(attack(attackType));
             }
 
-            Vector3 relativePos = target.transform.position - transform.position;
+            Vector3 relativePos = target.transform.position - transform.position; // adjust for speed
+            float currentDistance = Vector3.Distance(target.transform.position, transform.position);
+            if (currentDistance <= stoppingDistance)
+            {
+                canAttack = true;
+                stopMovement();
+            }
             navMeshAgent.transform.rotation = Quaternion.LookRotation(relativePos);
             
             // add aim  variance
@@ -183,6 +192,7 @@ public class AI : MonoBehaviour
             if (navMeshAgent.isStopped == false)
             {
                 navMeshAgent.acceleration = 0f;
+                navMeshAgent.SetDestination(gameObject.transform.position);
             }
         }
 
@@ -326,6 +336,16 @@ public class AI : MonoBehaviour
 
         return false; // no need for else as return stops statement before reaching this
     }
+    public bool isAnimatorPlayingState(string state)
+    {
+        return false;
+    }
+
+
+
+
+
+
 
 
 
@@ -335,6 +355,12 @@ public class AI : MonoBehaviour
         Debug.Log(gameObject.name + " was destroyed");
         
     }
+
+
+
+
+
+
 
     private void OnTriggerEnter(Collider other)
     {
