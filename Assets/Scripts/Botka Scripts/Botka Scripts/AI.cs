@@ -159,7 +159,7 @@ public class AI : MonoBehaviour
 
             if (navMeshAgent.destination != target.transform.position)
             {
-                navMeshAgent.SetDestination(target.transform.position);
+                navMeshAgent.SetDestination(new Vector3(target.transform.position.x,transform.position.y,target.transform.position.z));
             }
             if (attackCoroutine == null)
             {
@@ -211,7 +211,7 @@ public class AI : MonoBehaviour
         {
             if (enemyAttributes != null)
             {
-                navMeshAgent.SetDestination(target.transform.position);
+                navMeshAgent.SetDestination(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
                 
                 // navMeshAgent.acceleration = enemyAttributes.getMovementSpeed;
 
