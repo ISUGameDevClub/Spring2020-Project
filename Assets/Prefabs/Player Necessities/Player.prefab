@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2134223098}
   - component: {fileID: 2134223100}
-  - component: {fileID: 2134223099}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -74,14 +73,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &2134223099
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2134223097}
-  m_Enabled: 1
 --- !u!1 &2016886955603074637
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +271,7 @@ GameObject:
   - component: {fileID: 2016886956678705981}
   - component: {fileID: 2016886956678705982}
   - component: {fileID: 2016886956678705986}
-  - component: {fileID: 1610254141}
+  - component: {fileID: 5367138190570533353}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -358,6 +349,7 @@ MonoBehaviour:
   reloadTime: 1
   ammo: 0
   secondaryFireSpread: 7
+  rateOfFire: 0.5
 --- !u!33 &2016886956678705980
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -433,7 +425,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!114 &1610254141
+--- !u!114 &5367138190570533353
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -442,10 +434,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2016886956678705983}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: afcf1cd62de95f14ca892306d96b6cbf, type: 3}
+  m_Script: {fileID: 11500000, guid: a8b5c0afd96ea5940a23ca01a9161531, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnOnDebugToConsole: 1
+  turnOnDebugToConsole: 0
   maxHealth: 100
   OverideDestroyFunctions: 0
   parentType: 0
