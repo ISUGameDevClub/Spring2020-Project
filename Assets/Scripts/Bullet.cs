@@ -20,16 +20,21 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player")
         {
             // DEAL DAMAGE TO PLAYER
+            other.gameObject.GetComponent<Health>().recieveDamage(damage);
+
         }
-        else if(other.gameObject.tag == "Enemy")
+        else if (other.gameObject.tag == "Enemy")
         {
-            // DEAL DAMAGE TO ENEMY
+            other.gameObject.GetComponent<Health>().recieveDamage(damage);
         }
 
-        Destroy(gameObject);
+        if (other.gameObject.tag != "Bullet")
+        {
+            Destroy(gameObject);
+        }
     }
 
     IEnumerator DespawnBullet()

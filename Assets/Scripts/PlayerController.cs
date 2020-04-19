@@ -53,11 +53,17 @@ public class PlayerController : MonoBehaviour
 
     private float grav = -9.81f;
 
+    public  bool forcedWalk;
     private bool disableRight;
     private bool disableLeft;
     private bool canStand;
 
     private bool hasSecondJump;
+    [Header("debug")]
+    public bool x;
+
+    private bool airDashCD;
+    public float airDashCDTime = 2f;
 
     void Start()
     {
@@ -115,7 +121,7 @@ public class PlayerController : MonoBehaviour
         if (doubleJump > 0 && hasSecondJump && !isGrounded() && wallJumpDirection == 0 && transform.localScale.y == desiredScale.y)
             DoubleJump();
 
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl) || forcedWalk)
             running = false;
         else
             running = true;
@@ -141,8 +147,11 @@ public class PlayerController : MonoBehaviour
         }
         else if (crouching && !Input.GetButton("Slide") && isGrounded() && NoObjectAbove() && canStand)
             crouching = false;
-        else if (!isGrounded())
-            crouching = false;
+
+        //This is where I well implement an air dash method
+        else if (!isGrounded() && Input.GetButton("Slide")&&!airDashCD)
+            AirDash();
+            
 
         if (!crouching)
         {
@@ -395,5 +404,37 @@ public class PlayerController : MonoBehaviour
         inWind = false;
         windDirection = Vector3.zero;
         windPower = 0;
+    }
+
+    public void AirDash()
+    {
+        if (!airDashCD)
+        {
+        airDashCD = true;
+        StartCoroutine(AirDashCoroutine());
+        }
+    }
+
+    IEnumerator AirDashCoroutine()
+    {
+        if (Input.GetAxisRaw("Horizontal") < 0)
+        {
+            rb.AddForce(jumpForce * 2f * -transform.right, ForceMode.Impulse);
+        }
+        else if(Input.GetAxisRaw("Horizontal") > 0)
+        {
+            rb.AddForce(jumpForce * 2f * transform.right, ForceMode.Impulse);
+        }
+        else if (Input.GetAxisRaw("Vertical") < 0)
+        {
+            rb.AddForce(jumpForce * 1.5f * -transform.forward, ForceMode.Impulse);
+        }
+        else if (Input.GetAxisRaw("Vertical") > 0)
+        {
+            rb.AddForce(jumpForce * 1.5f * transform.forward, ForceMode.Impulse);
+        }
+        
+        yield return new WaitForSeconds(airDashCDTime);
+        airDashCD = false;
     }
 }

@@ -1,0 +1,242 @@
+fileFormatVersion: 2
+guid: e6f1783e1fe0df6448b1b2151d32e650
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Bone.001
+    100002: Bone.001 1
+    100004: Bone.002
+    100006: Bone.002 1
+    100008: Bone.003
+    100010: Bone.003 1
+    100012: Bone.004
+    100014: Bone.004 1
+    100016: Bone.005
+    100018: Bone.005 1
+    100020: Bone.006
+    100022: Bone.006 1
+    100024: Bone.007
+    100026: Bone.007 1
+    100028: Bone.007_end
+    100030: Bone.007_end 1
+    100032: Bone.008
+    100034: Bone.008 1
+    100036: Bone.009
+    100038: Bone.009 1
+    100040: Bone.010
+    100042: Bone.010 1
+    100044: Bone.011
+    100046: Bone.011 1
+    100048: Bone.012
+    100050: Bone.012 1
+    100052: Bone.013
+    100054: Bone.013 1
+    100056: Bone.013_end
+    100058: Bone.013_end 1
+    100060: Bone.014
+    100062: Bone.014 1
+    100064: Bone.015
+    100066: Bone.015 1
+    100068: Bone.015_end
+    100070: Bone.015_end 1
+    100072: Bone.016
+    100074: Bone.016 1
+    100076: Bone.017
+    100078: Bone.017 1
+    100080: Bone.017_end
+    100082: Bone.017_end 1
+    100084: Bone.018
+    100086: Bone.018 1
+    100088: Bone.019
+    100090: Bone.019 1
+    100092: Bone.019_end
+    100094: Bone.019_end 1
+    100096: Camera
+    100098: Cube
+    100100: Forearm
+    100102: Forearm 1
+    100104: //RootNode
+    100106: Humerous
+    100108: Humerous 1
+    100110: Lamp
+    100112: LeftHand
+    100114: LeftHand_Armature
+    100116: Plane
+    100118: RightHand
+    100120: RightHand_Armature
+    100122: Sun
+    100124: Wrist
+    100126: Wrist 1
+    400000: Bone.001
+    400002: Bone.001 1
+    400004: Bone.002
+    400006: Bone.002 1
+    400008: Bone.003
+    400010: Bone.003 1
+    400012: Bone.004
+    400014: Bone.004 1
+    400016: Bone.005
+    400018: Bone.005 1
+    400020: Bone.006
+    400022: Bone.006 1
+    400024: Bone.007
+    400026: Bone.007 1
+    400028: Bone.007_end
+    400030: Bone.007_end 1
+    400032: Bone.008
+    400034: Bone.008 1
+    400036: Bone.009
+    400038: Bone.009 1
+    400040: Bone.010
+    400042: Bone.010 1
+    400044: Bone.011
+    400046: Bone.011 1
+    400048: Bone.012
+    400050: Bone.012 1
+    400052: Bone.013
+    400054: Bone.013 1
+    400056: Bone.013_end
+    400058: Bone.013_end 1
+    400060: Bone.014
+    400062: Bone.014 1
+    400064: Bone.015
+    400066: Bone.015 1
+    400068: Bone.015_end
+    400070: Bone.015_end 1
+    400072: Bone.016
+    400074: Bone.016 1
+    400076: Bone.017
+    400078: Bone.017 1
+    400080: Bone.017_end
+    400082: Bone.017_end 1
+    400084: Bone.018
+    400086: Bone.018 1
+    400088: Bone.019
+    400090: Bone.019 1
+    400092: Bone.019_end
+    400094: Bone.019_end 1
+    400096: Camera
+    400098: Cube
+    400100: Forearm
+    400102: Forearm 1
+    400104: //RootNode
+    400106: Humerous
+    400108: Humerous 1
+    400110: Lamp
+    400112: LeftHand
+    400114: LeftHand_Armature
+    400116: Plane
+    400118: RightHand
+    400120: RightHand_Armature
+    400122: Sun
+    400124: Wrist
+    400126: Wrist 1
+    2000000: Camera
+    2100000: Hand3
+    2100002: No Name
+    2100004: Material
+    2300000: Cube
+    2300002: Plane
+    3300000: Cube
+    3300002: Plane
+    4300000: LeftHand
+    4300002: Plane
+    4300004: RightHand
+    4300006: Cube
+    7400000: LeftHand_Armature|Action1
+    7400002: LeftHand_Armature|Action2
+    7400004: LeftHand_Armature|Action2.001
+    7400006: RightHand_Armature|Action1
+    7400008: RightHand_Armature|Action2
+    7400010: RightHand_Armature|Action2.001
+    9500000: //RootNode
+    10800000: Lamp
+    10800002: Sun
+    13700000: LeftHand
+    13700002: RightHand
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
