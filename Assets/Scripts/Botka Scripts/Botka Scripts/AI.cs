@@ -7,6 +7,12 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Enemy), typeof(Collider))]
 public class AI : MonoBehaviour
 {
+    public enum EntityStatus
+    {
+        None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
+
+    }
+
     public const string TAG = "AI";
 
     private const string ANIMATOR_STATE_IDLE = "idle";
@@ -24,18 +30,6 @@ public class AI : MonoBehaviour
     public float stoppingDistance =10;
 
     private Gun gun;
-
-
-
-
-    // private Gun gun;
-
-    public enum EntityStatus
-    {
-        None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
-
-    }
-
     public enum AIAttackType
     {
         Gun, Physical, None
@@ -80,7 +74,9 @@ public class AI : MonoBehaviour
     public bool canAttackDebug;
     public bool interruptedActive;
     public float navMeshPathfindingSpeed;
-
+    /**
+     * 
+     */
     void Awake()
     {
         canAttack = false;
@@ -89,7 +85,9 @@ public class AI : MonoBehaviour
         
         
     }
-    // Start is called before the first frame update
+    /**
+     * 
+     */
     void Start()
     {
         if (stoppingDistance <= 0)
@@ -111,7 +109,9 @@ public class AI : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    /**
+     * 
+     */
     void FixedUpdate()
     {
         dataValidation(); // first call
@@ -132,7 +132,7 @@ public class AI : MonoBehaviour
         {
             if (target != null)
             {
-                if (checkIfInRangeOfTarget())
+                if (!(this.checkIfWithinStoppingDistance(stoppingDistance)))
                 {
                     moveTowardsTarget();
                    
@@ -143,14 +143,26 @@ public class AI : MonoBehaviour
         updateVariables(); // last call
         
     }
-
-    private bool checkIfInRangeOfTarget()
+    /**
+     * @param distance
+     * 
+     */
+    private bool checkIfWithinStoppingDistance(float distance)
     {
-      
+        float currentDistance = Vector3.Distance(target.transform.position, transform.position);
+        if (currentDistance <= distance)
+        {
+            return false;
+        }
+        else
+        {
             return true;
+        }
 
     }
-
+    /**
+     * 
+     */
     [ContextMenu("Activate pathfinding to target")]
     private void moveTowardsTarget()
     {
@@ -167,8 +179,8 @@ public class AI : MonoBehaviour
             }
 
             Vector3 relativePos = target.transform.position - gun.bulletSpawn.transform.position; // adjust for speed
-            float currentDistance = Vector3.Distance(target.transform.position, transform.position);
-            if (currentDistance <= stoppingDistance)
+     
+            if (this.checkIfWithinStoppingDistance(stoppingDistance))
             {
                 canAttack = true;
                 stopMovement();
@@ -185,12 +197,14 @@ public class AI : MonoBehaviour
         else
         {
             Debug.LogWarning(gameObject.name + " : Target Was null trying to fix in script");
-            ///
             Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
         }
 
     }
 
+    /**
+     * 
+     */
     [ContextMenu("Stop Movement")]
     private void stopMovement()
     {
@@ -205,6 +219,9 @@ public class AI : MonoBehaviour
 
     }
 
+    /**
+     * 
+     */
     private void resumeMovement()
     {
         if (navMeshAgent != null)
@@ -219,13 +236,17 @@ public class AI : MonoBehaviour
         }
       
     }
-
+    /**
+     * 
+     */
     public IEnumerator timeOutDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
 
     }
-
+    /**
+     * 
+     */
     private void dataValidation() // in normal programing done through interface calsses, validates data before ussage
     {
         if (target == null)
@@ -265,6 +286,10 @@ public class AI : MonoBehaviour
 
     }
 
+    /**
+     * Updates the variables of this script.
+     * Should be last call in update method
+     */
     private void updateVariables() // mostly for debug variables
     {
         entityStatusDubug = entityStatus;
@@ -275,6 +300,10 @@ public class AI : MonoBehaviour
         navMeshPathfindingSpeed = navMeshAgent.speed;
     }
 
+    /**
+     * @param attackType
+     * Coroutine that executes an attack dependent on the enum attayType
+     */
     [ContextMenu("Activate Attack")]
     public IEnumerator attack(AIAttackType attackType)
     {
@@ -283,7 +312,9 @@ public class AI : MonoBehaviour
 
     }
 
-
+    /**
+     * 
+     */
     private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
     {
         currentAttackExecution = attackType;
@@ -313,7 +344,9 @@ public class AI : MonoBehaviour
     }
 
 
-
+    /**
+     * 
+     */
     [ContextMenu("Cancel Attack")]
     private void cancelAttack()
     {
@@ -325,17 +358,23 @@ public class AI : MonoBehaviour
         
     }
 
-
+    /**
+     * 
+     */
     public bool isEquippedWeaponGun()
     {
         return false;
     }
-
+    /**
+     * 
+     */
     public bool isEquippedWeaponMeele()
     {
         return false;
     }
-
+    /**
+     * 
+     */
     public bool hasWeapon()
     {
         if (weapon != null)
@@ -345,10 +384,22 @@ public class AI : MonoBehaviour
 
         return false; // no need for else as return stops statement before reaching this
     }
+
+    /**
+     * @Param state
+     * A method that querries the current state of the animator to the specified paramter
+     */
     public bool isAnimatorPlayingState(string state)
     {
+        const int LAYER_INDEX = 0;
+        if (animator != null)
+        {
+            return animator.GetAnimatorTransitionInfo(LAYER_INDEX).IsName(state); //return if animation state of specified paramater is player
+        }
         return false;
     }
+
+
 
 
 
