@@ -166,7 +166,7 @@ public class AI : MonoBehaviour
                 attackCoroutine = StartCoroutine(attack(attackType));
             }
 
-            Vector3 relativePos = target.transform.position - transform.position; // adjust for speed
+            Vector3 relativePos = target.transform.position - gun.bulletSpawn.transform.position; // adjust for speed
             float currentDistance = Vector3.Distance(target.transform.position, transform.position);
             if (currentDistance <= stoppingDistance)
             {
@@ -177,7 +177,7 @@ public class AI : MonoBehaviour
             {
                 resumeMovement();
             }
-            navMeshAgent.transform.rotation = Quaternion.LookRotation(relativePos);
+            gun.bulletSpawn.transform.rotation = Quaternion.LookRotation(relativePos);
             
             // add aim  variance
 
