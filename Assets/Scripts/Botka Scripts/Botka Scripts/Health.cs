@@ -52,7 +52,8 @@ public class Health : MonoBehaviour
             maxHealth = Health.DefaultMaxHealth; //calls the script constant variable which has to be called statically
         }
 
-
+        if (gameObject.tag == "Player")
+            StartCoroutine(PassiveHealing());
 
 
 
@@ -192,5 +193,16 @@ public class Health : MonoBehaviour
     }
 
 
+    public IEnumerator PassiveHealing()
+    {
+        while (true)
+        {
+            if (currentHealth < maxHealth)
+            {
+                currentHealth += .6f;
+            }
+            yield return new WaitForSeconds(.1f);
+        }
+    }
 }
 

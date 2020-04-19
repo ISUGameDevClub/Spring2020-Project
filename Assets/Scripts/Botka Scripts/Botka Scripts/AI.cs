@@ -21,7 +21,7 @@ public class AI : MonoBehaviour
 
 
     private GameObject weapon;
-    public float stoppingDistance;
+    public float stoppingDistance =10;
 
     private Gun gun;
 
@@ -92,7 +92,10 @@ public class AI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        if (stoppingDistance <= 0)
+        {
+            stoppingDistance = 5;
+        }
         canMove = true;
 
         navMeshAgent.SetDestination(target.transform.position);
@@ -170,6 +173,10 @@ public class AI : MonoBehaviour
                 canAttack = true;
                 stopMovement();
             }
+            else
+            {
+                resumeMovement();
+            }
             navMeshAgent.transform.rotation = Quaternion.LookRotation(relativePos);
             
             // add aim  variance
@@ -191,7 +198,7 @@ public class AI : MonoBehaviour
         {
             if (navMeshAgent.isStopped == false)
             {
-                navMeshAgent.acceleration = 0f;
+                //navMeshAgent.acceleration = 0f;
                 navMeshAgent.SetDestination(gameObject.transform.position);
             }
         }
@@ -204,6 +211,8 @@ public class AI : MonoBehaviour
         {
             if (enemyAttributes != null)
             {
+                navMeshAgent.SetDestination(target.transform.position);
+                
                 // navMeshAgent.acceleration = enemyAttributes.getMovementSpeed;
 
             }
@@ -283,7 +292,7 @@ public class AI : MonoBehaviour
             case AIAttackType.Gun:
                 if (gun != null)
                 {
-                    gun.Fire();
+                    gun.EnemyFire();
                 }
                 break;
             case AIAttackType.Physical:

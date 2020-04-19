@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7456569095909847500}
   - component: {fileID: 7456569095909847491}
   - component: {fileID: 7456569095909847490}
+  - component: {fileID: 4994021066533569165}
   - component: {fileID: 3528018349423162419}
   m_Layer: 0
   m_Name: Test Enemy
@@ -123,6 +124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 873d5080b2751b7499c8b971df8e300a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stoppingDistance: 10
   target: {fileID: 0}
   navMeshAgent: {fileID: 7456569095909847490}
   attackType: 0
@@ -156,6 +158,27 @@ NavMeshAgent:
   m_BaseOffset: 0.5
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &4994021066533569165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7456569095909847489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 384d43b80942b8c4abb5777711253063, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletGameObject: {fileID: 9082029996726335750, guid: b9bb02cdd305ec448a7001f7ce83359b,
+    type: 3}
+  bulletSpawn: {fileID: 9082029996726335750, guid: b9bb02cdd305ec448a7001f7ce83359b,
+    type: 3}
+  maxAmmo: 0
+  reloadTime: 0
+  ammo: 10
+  secondaryFireSpread: 0
+  rateOfFire: 0.5
 --- !u!114 &3528018349423162419
 MonoBehaviour:
   m_ObjectHideFlags: 0
