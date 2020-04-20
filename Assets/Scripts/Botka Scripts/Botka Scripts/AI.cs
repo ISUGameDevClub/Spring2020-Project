@@ -21,7 +21,6 @@ public class AI : MonoBehaviour
     }
 
     public const string TAG = "AI";
-
     private const string ANIMATOR_STATE_IDLE = "idle";
     private const string ANIMATOR_STATE_WALKING = "walking";
     private const string ANIMATOR_STATE_RUNNING = "running";
@@ -34,7 +33,7 @@ public class AI : MonoBehaviour
 
 
     private GameObject weapon;
-    public float stoppingDistance;
+ 
 
     private Gun gun;
     public enum AIAttackType
@@ -44,9 +43,10 @@ public class AI : MonoBehaviour
 
     [Header("Essentials")]
 
-    [SerializeField] private GameObject target;
+   private GameObject target;
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private AIAttackType attackType;
+    [SerializeField] [Range(0f, 100f)] private float stoppingDistance;
 
     [Header("Enemy Attributes object data container")]
 
@@ -59,7 +59,7 @@ public class AI : MonoBehaviour
 
     private EntityStatus entityStatus;
     private bool canMove; //variable determines if AI is locked in position
-    private bool canAttack; 
+    private bool canAttack;
     private bool interrupt; // variable determinnes if AI should halt current coroutine
 
     private bool activateAnimationUssage; // debug perpuses
@@ -95,11 +95,16 @@ public class AI : MonoBehaviour
         
         
     }
-    /**
-     * 
-     */
+    
+ 
     void Start()
     {
+
+        if ((target = GameObject.FindGameObjectWithTag("Player")) != null)
+        {
+            target = GameObject.FindGameObjectWithTag("Player");
+        }
+
         if (stoppingDistance <= 0)
         {
             stoppingDistance = 5;
@@ -175,17 +180,17 @@ public class AI : MonoBehaviour
         if (animator == null) // animator variable is null, lets chekc to see if it exists
         {
             ActivateAnimationUssage = false;
-            Debug.LogWarning("Animator is missing attemting to fix in script");
+           // Debug.LogWarning("Animator is missing attemting to fix in script");
 
             if (gameObject.GetComponent<Animator>() != null) // checks its existance
             {
                 animator = gameObject.GetComponent<Animator>();
                 ActivateAnimationUssage = true;
-                Debug.LogWarning("Found animator, animator is now fixed. Check inspector to see if this could be prevented next time");
+                //Debug.LogWarning("Found animator, animator is now fixed. Check inspector to see if this could be prevented next time");
             }
             else
             {
-                Debug.LogError("Animator is missing, could NOT fix in script");
+               // Debug.LogError("Animator is missing, could NOT fix in script");
             }
         }
         else // animator is not null and exists
@@ -424,7 +429,7 @@ public class AI : MonoBehaviour
     private void OnDestroy()
     {
         StopAllCoroutines();
-        Debug.Log(gameObject.name + " was destroyed");
+       // Debug.Log(gameObject.name + " was destroyed");
         
     }
 
@@ -508,4 +513,5 @@ public class AI : MonoBehaviour
     public static string ANIMATOR_STATE_GUN_TWO1 => ANIMATOR_STATE_GUN_TWO;
 
     public static string ANIMATOR_STATE_GUN_THREE1 => ANIMATOR_STATE_GUN_THREE;
+
 }
