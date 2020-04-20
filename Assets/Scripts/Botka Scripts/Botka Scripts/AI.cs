@@ -43,7 +43,8 @@ public class AI : MonoBehaviour
 
     [Header("Essentials")]
 
-   private GameObject target;
+    private GameObject target;
+    private Vector3 lastRecordedPosition;
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private AIAttackType attackType;
     [SerializeField] [Range(0f, 100f)] private float stoppingDistance;
@@ -84,16 +85,12 @@ public class AI : MonoBehaviour
 
 
 
-    /**
-* 
-*/
     void Awake()
     {
         CanAttack = false;
         CanMove = false;
         Interrupt = false;
-        
-        
+               
     }
     
  
@@ -110,7 +107,7 @@ public class AI : MonoBehaviour
             stoppingDistance = 5;
         }
         CanMove = true;
-
+        lastRecordedPosition = target.transform.position;
         navMeshAgent.SetDestination(target.transform.position);
         navMeshAgent.updatePosition = true;
         navMeshAgent.updateRotation = true;
@@ -213,6 +210,11 @@ public class AI : MonoBehaviour
         interruptedActive = Interrupt;
         navMeshPathfindingSpeed = navMeshAgent.speed;
     }
+
+    private bool isTargetInLineOfSight()
+    {
+        return true;
+    }
     /**
      * @param distance
      * 
@@ -236,23 +238,34 @@ public class AI : MonoBehaviour
     [ContextMenu("Activate pathfinding to target")]
     private void moveTowardsTarget()
     {
+        Vector3 targetPosition = target.transform.position;
         if (target != null)
         {
-
-            if (navMeshAgent.destination != target.transform.position)
+            if (!(isTargetInLineOfSight()))
             {
-                navMeshAgent.SetDestination(target.transform.position);
+                targetPosition = lastRecordedPosition;
+               
             }
-            if (AttackCoroutine == null)
+            else
             {
-                AttackCoroutine = StartCoroutine(attack(attackType));
+                lastRecordedPosition = targetPosition;
             }
 
+            if (navMeshAgent.destination != targetPosition)
+            {
+                navMeshAgent.SetDestination(targetPosition);
+            }
+
+    
             Vector3 relativePos = target.transform.position - gun.bulletSpawn.transform.position; // adjust for speed
      
             if (this.checkIfWithinStoppingDistance(stoppingDistance))
             {
                 CanAttack = true;
+                if (AttackCoroutine == null)
+                {
+                    AttackCoroutine = StartCoroutine(attack(attackType));
+                }
                 stopMovement();
             }
             else
@@ -376,7 +389,7 @@ public class AI : MonoBehaviour
     }
 
     /**
-     * 
+     * checks to see if the weapon equppied is a gun vs melle weapin
      */
     public bool isEquippedWeaponGun()
     {
@@ -397,7 +410,7 @@ public class AI : MonoBehaviour
         return false;
     }
     /**
-     * 
+     * Checks if AI has a weapon equppied
      */
     public bool hasWeapon()
     {
