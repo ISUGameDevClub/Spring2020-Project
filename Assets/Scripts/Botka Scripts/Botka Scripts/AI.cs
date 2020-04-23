@@ -2,13 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
+/**
+ * @Author Jake Botka
+ * 
+ */
 
 [RequireComponent(typeof(Enemy), typeof(Collider))]
 public class AI : MonoBehaviour
 {
-    public const string TAG = "AI";
+    /**
+     * @Author Jake Botka
+     * 
+     */
+    public enum EntityStatus
+    {
+        None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
 
+    }
+
+    public const string TAG = "AI";
     private const string ANIMATOR_STATE_IDLE = "idle";
     private const string ANIMATOR_STATE_WALKING = "walking";
     private const string ANIMATOR_STATE_RUNNING = "running";
@@ -21,21 +33,9 @@ public class AI : MonoBehaviour
 
 
     private GameObject weapon;
-    public float stoppingDistance =10;
+ 
 
     private Gun gun;
-
-
-
-
-    // private Gun gun;
-
-    public enum EntityStatus
-    {
-        None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
-
-    }
-
     public enum AIAttackType
     {
         Gun, Physical, None
@@ -43,9 +43,11 @@ public class AI : MonoBehaviour
 
     [Header("Essentials")]
 
-    [SerializeField] private GameObject target;
+    private GameObject target;
+    private Vector3 lastRecordedPosition;
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private AIAttackType attackType;
+    [SerializeField] [Range(0f, 100f)] private float stoppingDistance;
 
     [Header("Enemy Attributes object data container")]
 
@@ -58,7 +60,7 @@ public class AI : MonoBehaviour
 
     private EntityStatus entityStatus;
     private bool canMove; //variable determines if AI is locked in position
-    private bool canAttack; 
+    private bool canAttack;
     private bool interrupt; // variable determinnes if AI should halt current coroutine
 
     private bool activateAnimationUssage; // debug perpuses
@@ -80,28 +82,42 @@ public class AI : MonoBehaviour
     public bool canAttackDebug;
     public bool interruptedActive;
     public float navMeshPathfindingSpeed;
+    public string raycastColliderInfo;
+    public Vector3 targetPosition;
+    public Vector3 targetsLastKnownCordinates;
+    public bool persuringTarget;
+    public bool inStoppingDistance;
+
+
 
     void Awake()
     {
-        canAttack = false;
-        canMove = false;
-        interrupt = false;
-        
-        
+        CanAttack = false;
+        CanMove = false;
+        Interrupt = false;
+               
     }
-    // Start is called before the first frame update
+    
+ 
     void Start()
     {
+
+        if ((target = GameObject.FindGameObjectWithTag("Player")) != null)
+        {
+            target = GameObject.FindGameObjectWithTag("Player");
+        }
+
         if (stoppingDistance <= 0)
         {
             stoppingDistance = 5;
         }
-        canMove = true;
-
+        CanMove = true;
+        lastRecordedPosition = target.transform.position;
         navMeshAgent.SetDestination(target.transform.position);
         navMeshAgent.updatePosition = true;
         navMeshAgent.updateRotation = true;
-        
+      
+
         dataValidation();
         gun = null;
         if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
@@ -111,31 +127,38 @@ public class AI : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    /**
+     * 
+     */
     void FixedUpdate()
     {
         dataValidation(); // first call
 
-        if (interrupt)
+        if (Interrupt)
         {
-            if (attackCoroutine != null)
+            if (AttackCoroutine != null)
             {
-                StopCoroutine(attackCoroutine);
-                attackCoroutine = null;
+                StopCoroutine(AttackCoroutine);
+                AttackCoroutine = null;
             }
 
             // stop movement
    
         }
 
-        if (canMove)
+        if (CanMove)
         {
             if (target != null)
             {
-                if (checkIfInRangeOfTarget())
+                if (!(this.checkIfWithinStoppingDistance(stoppingDistance)))
                 {
                     moveTowardsTarget();
+                    inStoppingDistance = false;
                    
+                }
+                else
+                {
+                    inStoppingDistance = true;
                 }
             }
         }
@@ -143,89 +166,9 @@ public class AI : MonoBehaviour
         updateVariables(); // last call
         
     }
-
-    private bool checkIfInRangeOfTarget()
-    {
-      
-            return true;
-
-    }
-
-    [ContextMenu("Activate pathfinding to target")]
-    private void moveTowardsTarget()
-    {
-        if (target != null)
-        {
-
-            if (navMeshAgent.destination != target.transform.position)
-            {
-                navMeshAgent.SetDestination(new Vector3(target.transform.position.x,transform.position.y,target.transform.position.z));
-            }
-            if (attackCoroutine == null)
-            {
-                attackCoroutine = StartCoroutine(attack(attackType));
-            }
-
-            Vector3 relativePos = target.transform.position - gun.bulletSpawn.transform.position; // adjust for speed
-            float currentDistance = Vector3.Distance(target.transform.position, transform.position);
-            if (currentDistance <= stoppingDistance)
-            {
-                canAttack = true;
-                stopMovement();
-            }
-            else
-            {
-                resumeMovement();
-            }
-            gun.bulletSpawn.transform.rotation = Quaternion.LookRotation(relativePos);
-            
-            // add aim  variance
-
-        }
-        else
-        {
-            Debug.LogWarning(gameObject.name + " : Target Was null trying to fix in script");
-            ///
-            Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
-        }
-
-    }
-
-    [ContextMenu("Stop Movement")]
-    private void stopMovement()
-    {
-        if (navMeshAgent != null)
-        {
-            if (navMeshAgent.isStopped == false)
-            {
-                //navMeshAgent.acceleration = 0f;
-                navMeshAgent.SetDestination(gameObject.transform.position);
-            }
-        }
-
-    }
-
-    private void resumeMovement()
-    {
-        if (navMeshAgent != null)
-        {
-            if (enemyAttributes != null)
-            {
-                navMeshAgent.SetDestination(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
-                
-                // navMeshAgent.acceleration = enemyAttributes.getMovementSpeed;
-
-            }
-        }
-      
-    }
-
-    public IEnumerator timeOutDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-    }
-
+    /**
+    * 
+    */
     private void dataValidation() // in normal programing done through interface calsses, validates data before ussage
     {
         if (target == null)
@@ -233,61 +176,219 @@ public class AI : MonoBehaviour
             // handle
         }
 
-        if (canAttack == false)
+        if (CanAttack == false)
         {
-            if (attackCoroutine != null)
+            if (AttackCoroutine != null)
             {
-                StopCoroutine(attackCoroutine);
-                attackCoroutine = null;
+                StopCoroutine(AttackCoroutine);
+                AttackCoroutine = null;
             }
         }
 
         if (animator == null) // animator variable is null, lets chekc to see if it exists
         {
-            activateAnimationUssage = false;
-            Debug.LogWarning("Animator is missing attemting to fix in script");
+            ActivateAnimationUssage = false;
+           // Debug.LogWarning("Animator is missing attemting to fix in script");
 
             if (gameObject.GetComponent<Animator>() != null) // checks its existance
             {
                 animator = gameObject.GetComponent<Animator>();
-                activateAnimationUssage = true;
-                Debug.LogWarning("Found animator, animator is now fixed. Check inspector to see if this could be prevented next time");
+                ActivateAnimationUssage = true;
+                //Debug.LogWarning("Found animator, animator is now fixed. Check inspector to see if this could be prevented next time");
             }
             else
             {
-                Debug.LogError("Animator is missing, could NOT fix in script");
+               // Debug.LogError("Animator is missing, could NOT fix in script");
             }
         }
         else // animator is not null and exists
         {
-            activateAnimationUssage = true;
+            ActivateAnimationUssage = true;
         }
 
     }
 
+    /**
+     * Updates the variables of this script.
+     * Should be last call in update method
+     */
     private void updateVariables() // mostly for debug variables
     {
-        entityStatusDubug = entityStatus;
+        entityStatusDubug = EntityStatus1;
         entityLocation = gameObject.transform.position;
-        canMoveDebug = canMove;
-        canAttackDebug = canAttack;
-        interruptedActive = interrupt;
+        canMoveDebug = CanMove;
+        canAttackDebug = CanAttack;
+        interruptedActive = Interrupt;
         navMeshPathfindingSpeed = navMeshAgent.speed;
+        targetsLastKnownCordinates = lastRecordedPosition;
+        targetPosition = target.transform.position;
     }
 
+    private bool isTargetInLineOfSight()
+    {
+        RaycastHit hit;
+        Vector3 tt = target.transform.position - transform.position;
+
+
+        if (Physics.Raycast(transform.position, tt, out hit, 100f))
+        {
+            raycastColliderInfo = hit.collider.gameObject.name;
+            if (hit.collider.gameObject.transform.root.tag == "Player")
+            {
+               
+                return true;
+            }
+          
+        }
+        else
+        {
+            raycastColliderInfo = "";
+        }
+        Debug.DrawRay(transform.position,tt, Color.green);
+        return false;
+    }
+    /**
+     * @param distance
+     * 
+     */
+    private bool checkIfWithinStoppingDistance(float distance)
+    {
+        float currentDistance = Vector3.Distance(target.transform.position, transform.position);
+       
+        if (currentDistance <= distance)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+    /**
+     * 
+     */
+    [ContextMenu("Activate pathfinding to target")]
+    private void moveTowardsTarget()
+    {
+        Vector3 targetPosition = target.transform.position;
+        if (target != null)
+        {
+            if (!(isTargetInLineOfSight()))
+            {
+                targetPosition = lastRecordedPosition;
+                persuringTarget = false;
+         
+
+            }
+            else
+            {
+                persuringTarget = true;
+                lastRecordedPosition = targetPosition;
+              
+                transform.rotation = Quaternion.LookRotation(target.transform.position - gun.bulletSpawn.transform.position);
+            }
+
+            if (navMeshAgent.destination != targetPosition)
+            {
+                navMeshAgent.SetDestination(targetPosition);
+            }
+
+    
+            Vector3 relativePos = target.transform.position - gun.bulletSpawn.transform.position; // adjust for speed
+     
+            if (this.checkIfWithinStoppingDistance(stoppingDistance))
+            {
+                CanAttack = true;
+                if (AttackCoroutine == null)
+                {
+                    AttackCoroutine = StartCoroutine(attack(attackType));
+                }
+                stopMovement();
+            }
+            else
+            {
+                resumeMovement();
+            }
+            gun.bulletSpawn.transform.rotation = Quaternion.LookRotation(relativePos);
+           
+
+            // add aim  variance
+
+        }
+        else
+        {
+           // Debug.LogWarning(gameObject.name + " : Target Was null trying to fix in script");
+           // Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
+        }
+
+    }
+
+    /**
+     * 
+     */
+    [ContextMenu("Stop Movement")]
+    private void stopMovement()
+    {
+        if (navMeshAgent != null)
+        {
+            if (navMeshAgent.isStopped == false)
+            {
+                navMeshAgent.SetDestination(gameObject.transform.position);
+            
+            }
+        }
+
+    }
+
+    /**
+     * 
+     */
+    private void resumeMovement()
+    {
+        if (navMeshAgent != null)
+        {
+           
+            if (enemyAttributes != null)
+            {
+                navMeshAgent.SetDestination(target.transform.position);
+                
+                // navMeshAgent.acceleration = enemyAttributes.getMovementSpeed;
+
+            }
+        }
+      
+    }
+    /**
+     * 
+     */
+    public IEnumerator timeOutDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+    }
+   
+
+    /**
+     * @param attackType
+     * Coroutine that executes an attack dependent on the enum attayType
+     */
     [ContextMenu("Activate Attack")]
     public IEnumerator attack(AIAttackType attackType)
     {
-        yield return new WaitUntil(() => canAttack == true);
+        yield return new WaitUntil(() => CanAttack == true);
         StartCoroutine(executeAttack(attackType));
 
     }
 
-
+    /**
+     * @param attackType
+     * Exeuctes attack using a couroutine that is dependent on the return value of @param.
+     */
     private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
     {
-        currentAttackExecution = attackType;
-        switch (currentAttackExecution)
+        CurrentAttackExecution = attackType;
+        switch (CurrentAttackExecution)
         {
             case AIAttackType.Gun:
                 if (gun != null)
@@ -308,34 +409,49 @@ public class AI : MonoBehaviour
         yield return new WaitForSeconds(0f); // replace this line
 
 
-        attackCoroutine = null; // this must be last call
+        AttackCoroutine = null; // this must be last call
 
     }
 
 
-
+    /**
+     * Stopts the coroutine if the cororutine is active using its VARIABLE and not its method name
+     */
     [ContextMenu("Cancel Attack")]
     private void cancelAttack()
     {
-        if (attackCoroutine != null)
+        if (AttackCoroutine != null)
         {
-            StopCoroutine(attackCoroutine);
-            attackCoroutine = null;
+            StopCoroutine(AttackCoroutine);
+            AttackCoroutine = null;
         }
         
     }
 
-
+    /**
+     * checks to see if the weapon equppied is a gun vs melle weapin
+     */
     public bool isEquippedWeaponGun()
     {
-        return false;
+        if (gun != null && attackType == AIAttackType.Gun)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
-
+    /**
+     * 
+     */
     public bool isEquippedWeaponMeele()
     {
         return false;
     }
-
+    /**
+     * Checks if AI has a weapon equppied
+     */
     public bool hasWeapon()
     {
         if (weapon != null)
@@ -345,32 +461,35 @@ public class AI : MonoBehaviour
 
         return false; // no need for else as return stops statement before reaching this
     }
+
+    /**
+     * @Param state
+     * A method that querries the current state of the animator to the specified paramter
+     */
     public bool isAnimatorPlayingState(string state)
     {
+        const int LAYER_INDEX = 0;
+        if (animator != null)
+        {
+            return animator.GetAnimatorTransitionInfo(LAYER_INDEX).IsName(state); //return if animation state of specified paramater is player
+        }
         return false;
     }
 
-
-
-
-
-
-
-
-
+    /**
+     * Automatically called by unity when the lifecycle of the gameobject has ended
+     */
     private void OnDestroy()
     {
         StopAllCoroutines();
-        Debug.Log(gameObject.name + " was destroyed");
+       // Debug.Log(gameObject.name + " was destroyed");
         
     }
 
-
-
-
-
-
-
+    /**
+     * @param other
+     * Automaticalled called by unity when the trigger collider associated witht he gameobject that this instance has been attached to has triggered called this enter state method
+     */
     private void OnTriggerEnter(Collider other)
     {
         // this makes sure that if the target and the target objects collider are on different hiearchy levels that it still will return true 
@@ -379,29 +498,29 @@ public class AI : MonoBehaviour
         {
             if (other.gameObject.tag == "RangeCollider") // this is for gun attacks
             {
-                if (attackCoroutine == null) // checks to see if the ai is attacking already
+                if (AttackCoroutine == null) // checks to see if the ai is attacking already
                 {
-                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Gun));
+                    AttackCoroutine = StartCoroutine(executeAttack(AIAttackType.Gun));
                 }
-                else if (currentAttackExecution != AIAttackType.Gun) // an attack is happening but we ovveride it with neew attack. This can happen if a player is running into the enemies physical trigger range where shooting would not be effective.
+                else if (CurrentAttackExecution != AIAttackType.Gun) // an attack is happening but we ovveride it with neew attack. This can happen if a player is running into the enemies physical trigger range where shooting would not be effective.
                 {
-                    StopCoroutine(attackCoroutine);
-                    attackCoroutine = null;
-                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Gun));
+                    StopCoroutine(AttackCoroutine);
+                    AttackCoroutine = null;
+                    AttackCoroutine = StartCoroutine(executeAttack(AIAttackType.Gun));
 
                 }
             }
             else // this is for meele attack
             {
-                if (attackCoroutine == null )
+                if (AttackCoroutine == null )
                 {
-                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack 
+                    AttackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack 
                 }
-                else if (currentAttackExecution != AIAttackType.Physical) // an attack is happening but we ovveride it with neew attack. This can happen if a player is running into the enemies physical trigger range where shooting would not be effective.
+                else if (CurrentAttackExecution != AIAttackType.Physical) // an attack is happening but we ovveride it with neew attack. This can happen if a player is running into the enemies physical trigger range where shooting would not be effective.
                 {
-                    StopCoroutine(attackCoroutine);
-                    attackCoroutine = null;
-                    attackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack with differenct attack type
+                    StopCoroutine(AttackCoroutine);
+                    AttackCoroutine = null;
+                    AttackCoroutine = StartCoroutine(executeAttack(AIAttackType.Physical)); // starts attack with differenct attack type
 
                 }
 
@@ -409,12 +528,43 @@ public class AI : MonoBehaviour
 
         }
     }
-
+    /**
+     * 
+     * 
+     */
     private void OnTriggerExit(Collider other)
     {
         
     }
 
     //setters and getters here
+
+    public EntityStatus EntityStatus1 { get => entityStatus; set => entityStatus = value; }
+    public bool CanMove { get => canMove; set => canMove = value; }
+    public bool CanAttack { get => canAttack; set => canAttack = value; }
+    public bool Interrupt { get => interrupt; set => interrupt = value; }
+    public bool ActivateAnimationUssage { get => activateAnimationUssage; set => activateAnimationUssage = value; }
+    public AIAttackType CurrentAttackExecution { get => currentAttackExecution; set => currentAttackExecution = value; }
+    public Coroutine AttackCoroutine { get => attackCoroutine; set => attackCoroutine = value; }
+    public float VelocityModiferier { get => velocityModiferier; set => velocityModiferier = value; }
+    public float DetectionRange { get => detectionRange; set => detectionRange = value; }
+
+    public static string ANIMATOR_STATE_IDLE1 => ANIMATOR_STATE_IDLE;
+
+    public static string ANIMATOR_STATE_WALKING1 => ANIMATOR_STATE_WALKING;
+
+    public static string ANIMATOR_STATE_RUNNING1 => ANIMATOR_STATE_RUNNING;
+
+    public static string ANIMATOR_STATE_MEELE_ONE1 => ANIMATOR_STATE_MEELE_ONE;
+
+    public static string ANIMATOR_STATE_MEELE_TWO1 => ANIMATOR_STATE_MEELE_TWO;
+
+    public static string ANIMATOR_STATE_MEELE_THREE1 => ANIMATOR_STATE_MEELE_THREE;
+
+    public static string ANIMATOR_STATE_GUN_ONE1 => ANIMATOR_STATE_GUN_ONE;
+
+    public static string ANIMATOR_STATE_GUN_TWO1 => ANIMATOR_STATE_GUN_TWO;
+
+    public static string ANIMATOR_STATE_GUN_THREE1 => ANIMATOR_STATE_GUN_THREE;
 
 }
