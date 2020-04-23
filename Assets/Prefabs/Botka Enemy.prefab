@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1423686111448637603
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7959405895078367120}
+  m_Layer: 0
+  m_Name: Spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7959405895078367120
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1423686111448637603}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.18, y: 0.145, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 7456569095909847496}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7456569095909847489
 GameObject:
   m_ObjectHideFlags: 0
@@ -18,7 +48,7 @@ GameObject:
   - component: {fileID: 4994021066533569165}
   - component: {fileID: 3528018349423162419}
   m_Layer: 0
-  m_Name: Test Enemy
+  m_Name: Botka Enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +64,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 12.045785, y: 0, z: 0.28342256}
   m_LocalScale: {x: 2, y: 2, z: 2}
-  m_Children: []
+  m_Children:
+  - {fileID: 7959405895078367120}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -124,10 +155,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 873d5080b2751b7499c8b971df8e300a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stoppingDistance: 10
-  target: {fileID: 0}
   navMeshAgent: {fileID: 7456569095909847490}
   attackType: 0
+  stoppingDistance: 10
   enemyAttributes: {fileID: 0}
   animator: {fileID: 0}
   entityStatusDubug: 0
@@ -136,6 +166,11 @@ MonoBehaviour:
   canAttackDebug: 0
   interruptedActive: 0
   navMeshPathfindingSpeed: 0
+  raycastColliderInfo: 
+  targetPosition: {x: 0, y: 0, z: 0}
+  targetsLastKnownCordinates: {x: 0, y: 0, z: 0}
+  persuringTarget: 0
+  inStoppingDistance: 0
 --- !u!195 &7456569095909847490
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -172,8 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletGameObject: {fileID: 9082029996726335750, guid: b9bb02cdd305ec448a7001f7ce83359b,
     type: 3}
-  bulletSpawn: {fileID: 9082029996726335750, guid: b9bb02cdd305ec448a7001f7ce83359b,
-    type: 3}
+  bulletSpawn: {fileID: 1423686111448637603}
   maxAmmo: 0
   reloadTime: 0
   ammo: 10

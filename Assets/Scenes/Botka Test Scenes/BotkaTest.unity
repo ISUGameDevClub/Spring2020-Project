@@ -5869,6 +5869,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1939418152}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1963071900 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7456569095909847489, guid: e6fc3b640566fe547b52b9e7b52369b4,
+    type: 3}
+  m_PrefabInstance: {fileID: 2081943602}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1992769993
 GameObject:
   m_ObjectHideFlags: 0
@@ -6048,6 +6054,11 @@ PrefabInstance:
       propertyPath: maxAmmo
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 4994021066533569165, guid: e6fc3b640566fe547b52b9e7b52369b4,
+        type: 3}
+      propertyPath: bulletSpawn
+      value: 
+      objectReference: {fileID: 1963071900}
     - target: {fileID: 7456569095909847489, guid: e6fc3b640566fe547b52b9e7b52369b4,
         type: 3}
       propertyPath: m_Name
