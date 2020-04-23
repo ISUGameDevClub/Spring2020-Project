@@ -33,7 +33,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3496022410767086125}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.045785, y: 0, z: 0.28342256}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 7424564645331430097}
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stoppingDistance: 0
-  target: {fileID: 0}
+  target: {fileID: 2016886956678705983, guid: 5fbec80e42f91fd4c9aa6a22cc41f5cb, type: 3}
   navMeshAgent: {fileID: 3496022410767086126}
   attackType: 0
   enemyAttributes: {fileID: 0}

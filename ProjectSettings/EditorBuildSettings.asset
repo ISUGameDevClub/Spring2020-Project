@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Demo Level.unity
     guid: 89b633c08fab5a2429e290c85aa9f1b2
+  - enabled: 1
+    path: Assets/Scenes/New Main_Map.unity
+    guid: cfb57e1dd49eaff4fab900b19ced985d
+  - enabled: 1
+    path: Assets/Scenes/Garage Interior.unity
+    guid: 783269f0fab521d4890ae2a0bdf301bf
   m_configObjects: {}
