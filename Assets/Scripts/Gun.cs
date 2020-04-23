@@ -48,12 +48,12 @@ public class Gun : MonoBehaviour
         }
     }
 
-    void allowFire()
+    public void allowFire()
     {
         canFire = true;
     }
 
-    void disAllowFire()
+    public void disAllowFire()
     {
         canFire = false;
     }
