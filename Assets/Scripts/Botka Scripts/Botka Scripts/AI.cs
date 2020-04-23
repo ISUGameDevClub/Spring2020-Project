@@ -293,16 +293,16 @@ public class AI : MonoBehaviour
             if (!(isTargetInLineOfSight()))
             {
                 targetPosition = lastRecordedPosition;
-                persuringTarget = false;
-                if (AttackCoroutine == null)
-                {
-                    AttackCoroutine = StartCoroutine(attack(attackType));
-                }
-
 
             }
             else
             {
+                persuringTarget = false;
+
+                if (AttackCoroutine == null)
+                {
+                    AttackCoroutine = StartCoroutine(attack(attackType));
+                }
                 persuringTarget = true;
                 lastRecordedPosition = targetPosition;
               
@@ -404,7 +404,7 @@ public class AI : MonoBehaviour
             case AIAttackType.Gun:
                 if (gun != null)
                 {
-                    Debug.Log("Aids");
+                    
                     gun.EnemyFire();
                 }
                 break;
