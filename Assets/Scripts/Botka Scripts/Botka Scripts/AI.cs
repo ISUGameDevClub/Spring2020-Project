@@ -294,7 +294,11 @@ public class AI : MonoBehaviour
             {
                 targetPosition = lastRecordedPosition;
                 persuringTarget = false;
-         
+                if (AttackCoroutine == null)
+                {
+                    AttackCoroutine = StartCoroutine(attack(attackType));
+                }
+
 
             }
             else
@@ -392,7 +396,8 @@ public class AI : MonoBehaviour
     private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
     {
         // variance
-        gun.bulletSpawn.transform.rotation = Quaternion.LookRotation( target.transform.position - transform.position);
+        gun.bulletSpawn.transform.rotation = Gun_Utils.aimVariance(2 ,gameObject, target.gameObject);
+
         CurrentAttackExecution = attackType;
         switch (CurrentAttackExecution)
         {
