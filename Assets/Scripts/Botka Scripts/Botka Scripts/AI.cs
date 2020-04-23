@@ -391,7 +391,8 @@ public class AI : MonoBehaviour
      */
     private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
     {
-        
+        // variance
+        gun.bulletSpawn.transform.rotation = Quaternion.LookRotation( target.transform.position - transform.position);
         CurrentAttackExecution = attackType;
         switch (CurrentAttackExecution)
         {
