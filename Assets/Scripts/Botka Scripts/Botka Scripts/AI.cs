@@ -152,12 +152,28 @@ public class AI : MonoBehaviour
             {
                 if (!(this.checkIfWithinStoppingDistance(stoppingDistance)))
                 {
+                   
                     moveTowardsTarget();
                     inStoppingDistance = false;
-                   
+                   if (navMeshAgent.isStopped)
+                    {
+                        this.resumeMovement();
+                        navMeshAgent.isStopped = false;
+                    }
                 }
                 else
                 {
+                    navMeshAgent.isStopped = true;
+                    CanAttack = true;
+                    if (AttackCoroutine == null)
+                    {
+                        AttackCoroutine = StartCoroutine(attack(attackType));
+                    }
+                    stopMovement();
+
+                   
+           
+                    
                     inStoppingDistance = true;
                 }
             }
@@ -297,19 +313,7 @@ public class AI : MonoBehaviour
     
             Vector3 relativePos = target.transform.position - gun.bulletSpawn.transform.position; // adjust for speed
      
-            if (this.checkIfWithinStoppingDistance(stoppingDistance))
-            {
-                CanAttack = true;
-                if (AttackCoroutine == null)
-                {
-                    AttackCoroutine = StartCoroutine(attack(attackType));
-                }
-                stopMovement();
-            }
-            else
-            {
-                resumeMovement();
-            }
+           
             gun.bulletSpawn.transform.rotation = Quaternion.LookRotation(relativePos);
            
 
@@ -387,12 +391,14 @@ public class AI : MonoBehaviour
      */
     private IEnumerator executeAttack(AIAttackType attackType) // this should call the attack animation
     {
+        
         CurrentAttackExecution = attackType;
         switch (CurrentAttackExecution)
         {
             case AIAttackType.Gun:
                 if (gun != null)
                 {
+                    Debug.Log("Aids");
                     gun.EnemyFire();
                 }
                 break;
@@ -406,7 +412,7 @@ public class AI : MonoBehaviour
 
 
 
-        yield return new WaitForSeconds(0f); // replace this line
+        yield return new WaitForSeconds(gun.rateOfFire); // replace this line
 
 
         AttackCoroutine = null; // this must be last call
