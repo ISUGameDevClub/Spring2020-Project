@@ -319,7 +319,7 @@ public class AI : MonoBehaviour
         else
         {
            // Debug.LogWarning(gameObject.name + " : Target Was null trying to fix in script");
-            Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
+           // Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
         }
 
     }

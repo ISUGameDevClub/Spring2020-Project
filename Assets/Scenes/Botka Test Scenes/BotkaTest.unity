@@ -6043,6 +6043,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4994021066533569165, guid: e6fc3b640566fe547b52b9e7b52369b4,
+        type: 3}
+      propertyPath: maxAmmo
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7456569095909847489, guid: e6fc3b640566fe547b52b9e7b52369b4,
         type: 3}
       propertyPath: m_Name
