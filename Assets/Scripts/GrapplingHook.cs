@@ -7,39 +7,58 @@ public class GrapplingHook : MonoBehaviour
     public GameObject hook;
     public GameObject hookHolder;
     public GameObject hookedObj;
-
+    private LineRenderer rope;
     public float hookSpeed;
     public float playerSpeed;
     public float maxDistance;
-
     private float currentDistance;
-    public static bool fired;
+    public bool fired;
     public bool hooked;
+    private KeyCode fireHook;
+    private Rigidbody rb;
+    private Coroutine x;
+    private Coroutine y;
+    public bool canFire;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        canFire = true;
+        fireHook = KeyCode.E;
+    }
 
     // Update is called once per frame
     void Update()
     {
         //to fire
-        if (Input.GetKey(KeyCode.E) && fired == false)
+        if (Input.GetKey(fireHook) && canFire)
         {
+            canFire = false;
             fired = true;
         }
 
-        //rendering the rope
-        if (fired)
+        //to allow and disallow gun fire
+        if (fired == true)
         {
-            LineRenderer rope = hook.GetComponent<LineRenderer>();
-            rope.SetVertexCount(2);
-            rope.SetPosition(0, hookHolder.transform.position);
-            rope.SetPosition(1, hook.transform.position);
+            GetComponent<Gun>().disAllowFire();
         }
-        
+        if(fired == false)
+        {
+            GetComponent<Gun>().allowFire();
+        }
+
+        if(GetComponent<PlayerController>().isGrounded() == true && fired == false)
+        {
+            hooked = false;
+        }
+        //rendering the rope
+        DrawRope();
+
         //returning the hook
         if (fired == true && hooked == false)
         {
             hook.transform.Translate(Vector3.forward * Time.deltaTime * hookSpeed);
             currentDistance = Vector3.Distance(transform.position, hook.transform.position);
-
             if (currentDistance >= maxDistance)
             {
                 ReturnHook();
@@ -49,52 +68,69 @@ public class GrapplingHook : MonoBehaviour
         //pulling the player to hooked object
         if (hooked == true && fired == true)
         {
-            hook.transform.parent = hookedObj.transform;
-            transform.position = Vector3.MoveTowards(transform.position, hook.transform.position, Time.deltaTime * playerSpeed);
+            hook.transform.parent = null;
+            Vector3 pos = Vector3.MoveTowards(transform.position, hook.transform.position, Time.deltaTime * playerSpeed);
+            rb.MovePosition(pos);
             float distanceToHook = Vector3.Distance(transform.position, hook.transform.position);
 
-            this.GetComponent<Rigidbody>().useGravity = false;
+            gameObject.GetComponent<Rigidbody>().useGravity = false;
 
             //returning hook once close enough and climbing the object
-            if (distanceToHook < 1)
+            if (distanceToHook < 1.85f)
             {
-                ReturnHook();
-                /*
-                if(GetComponent<PlayerController>().isGrounded())
+                if (x == null)
                 {
-                    this.transform.Translate(Vector3.forward * Time.deltaTime * 14f);
-                    this.transform.Translate(Vector3.up * Time.deltaTime * 18f);
+                    x = StartCoroutine(delay());
+                    ReturnHook();
                 }
-
-                StartCoroutine("Climb");
-                */
             }
         }
         else
         {
             hook.transform.parent = hookHolder.transform;
-            this.GetComponent<Rigidbody>().useGravity = true;
+            gameObject.GetComponent<Rigidbody>().useGravity = true;
         }
     }
 
-    //climbing method
-    IEnumerator Climb()
-    {
-        yield return new WaitForSeconds(0.1f);
-        ReturnHook();
-    }
-
-    //return hook method
-    void ReturnHook()
+    public void ReturnHook()
     {
         hook.transform.rotation = hookHolder.transform.rotation;
         hook.transform.position = hookHolder.transform.position;
         fired = false;
         hooked = false;
-
-        LineRenderer rope = hook.GetComponent<LineRenderer>();
-        rope.SetVertexCount(0);
-
+        if (y == null)
+        {
+            y= StartCoroutine(fireRate());
+        }
     }
 
+    private void DrawRope()
+    {
+        if (fired)
+        {
+            rope = hook.GetComponent<LineRenderer>();
+            rope.SetVertexCount(2);
+            rope.SetPosition(0, hookHolder.transform.position);
+            rope.SetPosition(1, hook.transform.position);
+        }
+        else
+        {
+            rope.SetVertexCount(0);
+        }
+    }
+
+    public IEnumerator delay()
+    {
+        yield return new WaitForSeconds(.70f);
+        yield return new WaitForEndOfFrame();
+        x = null;
+    }
+
+    public IEnumerator fireRate()
+    {
+        yield return new WaitForSeconds(1.75f);
+        yield return new WaitForEndOfFrame();
+        canFire = true;
+        y = null;
+    }
 }

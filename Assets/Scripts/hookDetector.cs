@@ -4,26 +4,27 @@ using UnityEngine;
 
 public class hookDetector : MonoBehaviour
 {
-
     public GameObject player;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    private Coroutine x;
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Hookable")
+        if (other.tag == "Hookable")
         {
-            player.GetComponent<GrapplingHook>().hooked = true;
-            player.GetComponent<GrapplingHook>().hookedObj = other.gameObject;
+            if (x == null)
+            {
+                x = StartCoroutine(delay());
+                player.GetComponent<GrapplingHook>().hooked = true;
+                player.GetComponent<GrapplingHook>().hookedObj = other.gameObject;
+            }
+
         }
     }
+
+    public IEnumerator delay() {
+        yield return new WaitForSeconds(.75f);
+        yield return new WaitForEndOfFrame();
+        x = null;
+    }
+
 }

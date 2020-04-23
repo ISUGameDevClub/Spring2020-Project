@@ -9,6 +9,7 @@ public class Gun : MonoBehaviour
 
     public int maxAmmo;
     public int reloadTime;
+    bool isPlayer;
     bool canFire;
     int ammo;
 
@@ -18,28 +19,32 @@ public class Gun : MonoBehaviour
     {
         ammo = maxAmmo;
         canFire = true;
+        isPlayer = GetComponent<PlayerController>() != null;
     }
 
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && canFire && ammo > 0)
+        if (isPlayer)
         {
-            Fire();
-        }
+            if (Input.GetMouseButtonDown(0) && canFire && ammo > 0)
+            {
+                Fire();
+            }
 
-        if (Input.GetKey(KeyCode.R))
-        {
-            currentReloadCoroutine = StartCoroutine(reload());
+            if (Input.GetKey(KeyCode.R))
+            {
+                currentReloadCoroutine = StartCoroutine(reload());
+            }
         }
     }
 
-    void allowFire()
+    public void allowFire()
     {
         canFire = true;
     }
 
-    void disAllowFire()
+    public void disAllowFire()
     {
         canFire = false;
     }
@@ -60,7 +65,7 @@ public class Gun : MonoBehaviour
         }
     }
 
-    void Fire()
+    public void Fire()
     {
         ammo--;
         Bullet bull = Instantiate(bulletGameObject, bulletSpawn.transform).GetComponent<Bullet>();

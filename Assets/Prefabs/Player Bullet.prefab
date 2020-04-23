@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 54100081789677730}
   - component: {fileID: 7571582390687790763}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Player Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 100
-  damage: 0
+  damage: 1
   despawnTime: 3
 --- !u!33 &9082029996726335747
 MeshFilter:
