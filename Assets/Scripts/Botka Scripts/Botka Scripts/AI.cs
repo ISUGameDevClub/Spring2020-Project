@@ -82,6 +82,11 @@ public class AI : MonoBehaviour
     public bool canAttackDebug;
     public bool interruptedActive;
     public float navMeshPathfindingSpeed;
+    public string raycastColliderInfo;
+    public Vector3 targetPosition;
+    public Vector3 targetsLastKnownCordinates;
+    public bool persuringTarget;
+    public bool inStoppingDistance;
 
 
 
@@ -111,7 +116,8 @@ public class AI : MonoBehaviour
         navMeshAgent.SetDestination(target.transform.position);
         navMeshAgent.updatePosition = true;
         navMeshAgent.updateRotation = true;
-        
+      
+
         dataValidation();
         gun = null;
         if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
@@ -147,7 +153,12 @@ public class AI : MonoBehaviour
                 if (!(this.checkIfWithinStoppingDistance(stoppingDistance)))
                 {
                     moveTowardsTarget();
+                    inStoppingDistance = false;
                    
+                }
+                else
+                {
+                    inStoppingDistance = true;
                 }
             }
         }
@@ -209,11 +220,32 @@ public class AI : MonoBehaviour
         canAttackDebug = CanAttack;
         interruptedActive = Interrupt;
         navMeshPathfindingSpeed = navMeshAgent.speed;
+        targetsLastKnownCordinates = lastRecordedPosition;
+        targetPosition = target.transform.position;
     }
 
     private bool isTargetInLineOfSight()
     {
-        return true;
+        RaycastHit hit;
+        Vector3 tt = target.transform.position - transform.position;
+
+
+        if (Physics.Raycast(transform.position, tt, out hit, 100f))
+        {
+            raycastColliderInfo = hit.collider.gameObject.name;
+            if (hit.collider.gameObject.transform.root.tag == "Player")
+            {
+               
+                return true;
+            }
+          
+        }
+        else
+        {
+            raycastColliderInfo = "";
+        }
+        Debug.DrawRay(transform.position,tt, Color.green);
+        return false;
     }
     /**
      * @param distance
@@ -222,13 +254,14 @@ public class AI : MonoBehaviour
     private bool checkIfWithinStoppingDistance(float distance)
     {
         float currentDistance = Vector3.Distance(target.transform.position, transform.position);
+       
         if (currentDistance <= distance)
         {
-            return false;
+            return true;
         }
         else
         {
-            return true;
+            return false;
         }
 
     }
@@ -244,11 +277,16 @@ public class AI : MonoBehaviour
             if (!(isTargetInLineOfSight()))
             {
                 targetPosition = lastRecordedPosition;
-               
+                persuringTarget = false;
+         
+
             }
             else
             {
+                persuringTarget = true;
                 lastRecordedPosition = targetPosition;
+              
+                transform.rotation = Quaternion.LookRotation(target.transform.position - gun.bulletSpawn.transform.position);
             }
 
             if (navMeshAgent.destination != targetPosition)
@@ -273,14 +311,15 @@ public class AI : MonoBehaviour
                 resumeMovement();
             }
             gun.bulletSpawn.transform.rotation = Quaternion.LookRotation(relativePos);
-            
+           
+
             // add aim  variance
 
         }
         else
         {
            // Debug.LogWarning(gameObject.name + " : Target Was null trying to fix in script");
-           // Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
+            Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
         }
 
     }
@@ -295,8 +334,8 @@ public class AI : MonoBehaviour
         {
             if (navMeshAgent.isStopped == false)
             {
-                //navMeshAgent.acceleration = 0f;
                 navMeshAgent.SetDestination(gameObject.transform.position);
+            
             }
         }
 
@@ -309,6 +348,7 @@ public class AI : MonoBehaviour
     {
         if (navMeshAgent != null)
         {
+           
             if (enemyAttributes != null)
             {
                 navMeshAgent.SetDestination(target.transform.position);
