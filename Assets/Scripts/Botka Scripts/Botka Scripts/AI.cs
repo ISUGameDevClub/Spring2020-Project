@@ -48,10 +48,15 @@ public class AI : MonoBehaviour
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private AIAttackType attackType;
     [SerializeField] [Range(0f, 100f)] private float stoppingDistance;
+    [Header("Patrol information")]
+    [SerializeField] private GameObject[] patrolPoints;
+    private GameObject currentPatrolPoint;
+    private int patrolPointIndex;
 
     [Header("Enemy Attributes object data container")]
 
-    [Tooltip("This object holds all of the data attributes for the script to read from. " )]
+    [Tooltip("This object holds all of the data attributes for the script to read from. ")]
+ 
     [SerializeField] private EnemyTypeAttributes enemyAttributes;
 
     [Header("Animation settings")]
@@ -83,6 +88,8 @@ public class AI : MonoBehaviour
     public bool interruptedActive;
     public float navMeshPathfindingSpeed;
     public string raycastColliderInfo;
+    public string AICurrentTargetName;
+    public Vector3 AICurrentTargetLocation;
     public Vector3 targetPosition;
     public Vector3 targetsLastKnownCordinates;
     public bool persuringTarget;
@@ -112,10 +119,9 @@ public class AI : MonoBehaviour
             stoppingDistance = 5;
         }
         CanMove = true;
-        lastRecordedPosition = target.transform.position;
-        navMeshAgent.SetDestination(target.transform.position);
         navMeshAgent.updatePosition = true;
         navMeshAgent.updateRotation = true;
+        lastRecordedPosition = Vector3.zero;
       
 
         dataValidation();
@@ -153,7 +159,9 @@ public class AI : MonoBehaviour
                 if (!(this.checkIfWithinStoppingDistance(stoppingDistance)))
                 {
                    
-                    moveTowardsTarget();
+                       this.moveTowardsTarget();
+                    
+                  
                     inStoppingDistance = false;
                    if (navMeshAgent.isStopped)
                     {
@@ -287,17 +295,43 @@ public class AI : MonoBehaviour
     [ContextMenu("Activate pathfinding to target")]
     private void moveTowardsTarget()
     {
-        Vector3 targetPosition = target.transform.position;
+        Vector3 targetPosition = Vector3.zero;
         if (target != null)
         {
             if (!(isTargetInLineOfSight()))
             {
-                targetPosition = lastRecordedPosition;
+                if (entityStatus == EntityStatus.Patrol)
+                {
+                    targetPosition = this.handlePatrolTransition();
+                }
+                else
+                {
+                    if (lastRecordedPosition == Vector3.zero) // enemy hasnt seen player at all yet
+                    {
+                        targetPosition = this.handlePatrolTransition();
+                    }
+                    else
+                    {
+                        targetPosition = lastRecordedPosition;
+                        if (Vector3.Distance(transform.position, targetPosition) <= 0.25f)
+                        {
+                           
+                            targetPosition = this.retrievePatrolPoint();
+                        }
+                        else
+                        {
+                            targetPosition = target.transform.position;
+                            entityStatus = EntityStatus.PursuingTarget;
+                        }
+                    }
+                }
 
             }
             else
             {
-                persuringTarget = false;
+                entityStatus = EntityStatus.PursuingTarget;
+                targetPosition = target.transform.position;
+                
 
                 if (AttackCoroutine == null)
                 {
@@ -309,6 +343,24 @@ public class AI : MonoBehaviour
                 transform.rotation = Quaternion.LookRotation(target.transform.position - gun.bulletSpawn.transform.position);
             }
 
+            switch (entityStatus)
+            {
+                case EntityStatus.Patrol:
+                    if (currentPatrolPoint != null)
+                    {
+                        AICurrentTargetName = currentPatrolPoint.name;
+                    }
+                    else
+                        AICurrentTargetName = "";
+                    break;
+                case EntityStatus.PursuingTarget:
+                    AICurrentTargetName = target.name;
+                    break;
+                default:
+                    break;
+            }
+
+            AICurrentTargetLocation = targetPosition;
             if (navMeshAgent.destination != targetPosition)
             {
                 navMeshAgent.SetDestination(targetPosition);
@@ -330,6 +382,76 @@ public class AI : MonoBehaviour
            // Debug.LogError(gameObject.name + " : Target is null, could NOT fix in script. Fix in inspector");
         }
 
+    }
+    public Vector3 handlePatrolTransition()
+    {
+        if (patrolPoints != null)
+        {
+            entityStatus = EntityStatus.Patrol;
+            if (currentPatrolPoint == null)
+            {
+                Debug.Log("Same");
+                return this.retrievePatrolPoint();
+            }
+            else if (Vector3.Distance(gameObject.transform.position, currentPatrolPoint.transform.position) <= 1f)
+            {
+
+                return this.retrieveNextPatrolPoint();
+            }
+            else
+            {
+                return currentPatrolPoint.transform.position;
+            }
+        }
+       
+        return Vector3.zero; // is null bassically
+    }
+    public Vector3 retrievePatrolPoint()
+    {
+        int index = -1; // init to  null value
+        Vector3 closestVec;
+        float closestDistance = -100f;
+      for (int i =0; i < patrolPoints.Length; i++)
+        {
+            if (i == 0)
+            {
+                closestVec = patrolPoints[i].transform.position;
+                closestDistance = Vector3.Distance(transform.position, closestVec);
+                index = i;
+            }
+            else
+            {
+                Vector3 vec = patrolPoints[i].transform.position;
+                float newDistance = Vector3.Distance(transform.position, patrolPoints[i].transform.position);
+                if (newDistance < closestDistance)
+                {
+                    closestDistance = newDistance;
+                    closestVec = patrolPoints[i].transform.position;
+                    index = i;
+                }
+                
+            }
+        }
+
+        currentPatrolPoint = patrolPoints[index];
+        return currentPatrolPoint.transform.position;
+    }
+
+    public Vector3 retrieveNextPatrolPoint()
+    {
+        int newIndex = -1;
+        newIndex = patrolPointIndex + 1; // this is very different then patrolIndex++. this is because we dont want to increment here but after the if statements
+        if (newIndex < patrolPoints.Length)
+        {
+            patrolPointIndex = newIndex;
+            currentPatrolPoint = patrolPoints[newIndex];
+        }
+        else
+        {
+            patrolPointIndex = 0;
+            currentPatrolPoint = patrolPoints[patrolPointIndex];
+        }
+        return currentPatrolPoint.transform.position;
     }
 
     /**
