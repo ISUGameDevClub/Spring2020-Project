@@ -18,11 +18,6 @@ public class HealthFade : MonoBehaviour
     void Update()
     {
         //CHANGE THIS IF ANNOYING
-        if (1 - health.currentHealth * .01f <= .3)
-            GetComponent<Image>().color = new Vector4(0, 0, 0, 1 - health.currentHealth * .01f);
-        else
-        {
-            GetComponent<Image>().color = new Vector4(0, 0, 0, .3f);
-        }
+        GetComponent<RawImage>().color = new Vector4(0, 0, 0, 1 - health.currentHealth * .01f);
     }
 }

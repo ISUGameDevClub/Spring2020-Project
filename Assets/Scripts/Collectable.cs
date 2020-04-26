@@ -18,7 +18,13 @@ public class Collectable : MonoBehaviour
     {
         if (other.tag == "Player")
         {
+            Collectables.amountCollected++;
             Collectables.collectables[collectable] = true;
+            if(Collectables.amountCollected >= 4)
+            {
+                //"curret" reloads scene you are in
+                FindObjectOfType<SceneTransitions>().LoadNewScene("VictoryScreen");
+            }
             Destroy(gameObject);
         }
     }

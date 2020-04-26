@@ -14,6 +14,7 @@ public class hookDetector : MonoBehaviour
             if (x == null)
             {
                 x = StartCoroutine(delay());
+                player.GetComponent<GrapplingHook>().HookReleaseWrapper();
                 player.GetComponent<GrapplingHook>().hooked = true;
                 player.GetComponent<GrapplingHook>().setHookedObj(other.gameObject);
             }
