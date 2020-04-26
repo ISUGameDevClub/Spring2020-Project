@@ -192,8 +192,8 @@ public class AI : MonoBehaviour
         if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
         { }
 
-        manager.registerAI(gameObject);
-        gameObject.GetComponent<AI>().enabled = false; // AI manager will activate
+        //manager.registerAI(gameObject);
+        //gameObject.GetComponent<AI>().enabled = false; // AI manager will activate
       
         
 

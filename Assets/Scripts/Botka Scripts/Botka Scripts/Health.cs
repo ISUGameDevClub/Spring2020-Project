@@ -119,7 +119,7 @@ public class Health : MonoBehaviour
             else
             {
                 Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
-                Destroy(gameObject.transform.root.gameObject); // Destroys gameobject
+                Destroy(gameObject.transform.gameObject); // Destroys gameobject
             }
 
         }
@@ -153,7 +153,7 @@ public class Health : MonoBehaviour
             else
             {
                 Debug.LogWarning(gameObject.name + "Has Died"); // logs death and deathorigin
-                Destroy(gameObject.transform.root.gameObject); // Destroys gameobject
+                Destroy(gameObject.transform.gameObject); // Destroys gameobject
             }
 
         }

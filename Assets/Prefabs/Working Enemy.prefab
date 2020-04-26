@@ -149,18 +149,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 873d5080b2751b7499c8b971df8e300a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stoppingDistance: 0
-  target: {fileID: 2016886956678705983, guid: 5fbec80e42f91fd4c9aa6a22cc41f5cb, type: 3}
   navMeshAgent: {fileID: 3496022410767086126}
   attackType: 0
+  stoppingDistance: 0
+  lockedInPlace: 0
+  patrolPoints: []
+  delayBetweenPoints: 2
+  pathingBehavior: 1
   enemyAttributes: {fileID: 0}
   animator: {fileID: 0}
+  customActivationRangeOverride: 0
+  activationRange: 0
+  wanderRadius: 0
   entityStatusDubug: 0
   entityLocation: {x: 0, y: 0, z: 0}
   canMoveDebug: 0
   canAttackDebug: 0
   interruptedActive: 0
   navMeshPathfindingSpeed: 0
+  raycastColliderInfo: 
+  AICurrentTargetName: 
+  AICurrentTargetLocation: {x: 0, y: 0, z: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
+  targetsLastKnownCordinates: {x: 0, y: 0, z: 0}
+  persuringTarget: 0
+  inStoppingDistance: 0
 --- !u!114 &1048433423490136102
 MonoBehaviour:
   m_ObjectHideFlags: 0
