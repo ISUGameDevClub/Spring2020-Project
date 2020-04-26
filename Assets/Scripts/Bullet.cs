@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public bool isPlayer;
     public float speed;
     public float damage;
     public float despawnTime;
@@ -20,7 +21,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" && !isPlayer)
         {
             // DEAL DAMAGE TO PLAYER
             other.gameObject.GetComponent<Health>().recieveDamage(damage);
