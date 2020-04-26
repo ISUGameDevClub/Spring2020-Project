@@ -4,5 +4,17 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Title Screen.unity
+    guid: d785991055e7e0542b57cce553dce40c
+  - enabled: 1
+    path: Assets/Scenes/New Main_Map.unity
+    guid: cfb57e1dd49eaff4fab900b19ced985d
+  - enabled: 1
+    path: Assets/Scenes/Garage Interior.unity
+    guid: 783269f0fab521d4890ae2a0bdf301bf
+  - enabled: 1
+    path: Assets/Scenes/VictoryScreen.unity
+    guid: 311ee8131fa22c14da4db3e245ca7007
   m_configObjects: {}

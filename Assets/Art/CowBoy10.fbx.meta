@@ -1,0 +1,232 @@
+fileFormatVersion: 2
+guid: c1d658811cce1bb439af46d39d1376a9
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Armature
+    100002: Arms
+    100004: BezierCircle
+    100006: BezierCircle.001
+    100008: BezierCircle.002
+    100010: Body
+    100012: Body 1
+    100014: Body.002
+    100016: Body.002_end
+    100018: Bottom
+    100020: Camera
+    100022: //RootNode
+    100024: Head
+    100026: Head_end
+    100028: L_Arm_Lower
+    100030: L_Arm_Upper
+    100032: L_Finger1
+    100034: L_Finger2
+    100036: L_Finger3
+    100038: L_Finger4
+    100040: L_Finger5
+    100042: L_Finger5_end
+    100044: L_Finger6
+    100046: L_Finger6_end
+    100048: L_Finger7
+    100050: L_Finger7_end
+    100052: L_Finger8
+    100054: L_Finger8_end
+    100056: L_Hand
+    100058: L_Shoulder
+    100060: Neck
+    100062: Plane
+    100064: Point
+    100066: R_Arm_Lower
+    100068: R_Arm_Upper
+    100070: R_Finger1
+    100072: R_Finger2
+    100074: R_Finger3
+    100076: R_Finger4
+    100078: R_Finger5
+    100080: R_Finger5_end
+    100082: R_Finger6
+    100084: R_Finger6_end
+    100086: R_Finger7
+    100088: R_Finger7_end
+    100090: R_Finger8
+    100092: R_Finger8_end
+    100094: R_Hand
+    100096: R_Shoulder
+    100098: Shoulders
+    100100: Sun.002
+    100102: Tail1
+    100104: Tail2
+    100106: Tail3
+    400000: Armature
+    400002: Arms
+    400004: BezierCircle
+    400006: BezierCircle.001
+    400008: BezierCircle.002
+    400010: Body
+    400012: Body 1
+    400014: Body.002
+    400016: Body.002_end
+    400018: Bottom
+    400020: Camera
+    400022: //RootNode
+    400024: Head
+    400026: Head_end
+    400028: L_Arm_Lower
+    400030: L_Arm_Upper
+    400032: L_Finger1
+    400034: L_Finger2
+    400036: L_Finger3
+    400038: L_Finger4
+    400040: L_Finger5
+    400042: L_Finger5_end
+    400044: L_Finger6
+    400046: L_Finger6_end
+    400048: L_Finger7
+    400050: L_Finger7_end
+    400052: L_Finger8
+    400054: L_Finger8_end
+    400056: L_Hand
+    400058: L_Shoulder
+    400060: Neck
+    400062: Plane
+    400064: Point
+    400066: R_Arm_Lower
+    400068: R_Arm_Upper
+    400070: R_Finger1
+    400072: R_Finger2
+    400074: R_Finger3
+    400076: R_Finger4
+    400078: R_Finger5
+    400080: R_Finger5_end
+    400082: R_Finger6
+    400084: R_Finger6_end
+    400086: R_Finger7
+    400088: R_Finger7_end
+    400090: R_Finger8
+    400092: R_Finger8_end
+    400094: R_Hand
+    400096: R_Shoulder
+    400098: Shoulders
+    400100: Sun.002
+    400102: Tail1
+    400104: Tail2
+    400106: Tail3
+    2000000: Camera
+    2100000: BaseTextured
+    2100002: Rubber
+    2100004: Material.001
+    2100006: Base
+    2100008: No Name
+    2300000: Arms
+    2300002: Bottom
+    2300004: Plane
+    2300006: Shoulders
+    3300000: Arms
+    3300002: Bottom
+    3300004: Plane
+    3300006: Shoulders
+    4300000: Body
+    4300002: BezierCircle
+    4300004: BezierCircle.001
+    4300006: BezierCircle.002
+    4300008: Bottom
+    4300010: Shoulders
+    4300012: Arms
+    4300014: Plane
+    7400000: Body|Idle.001
+    7400002: Armature|Idle
+    7400004: Armature|Idle.001
+    7400006: Armature|PoseLib
+    9500000: //RootNode
+    10800000: Point
+    10800002: Sun.002
+    13700000: BezierCircle
+    13700002: BezierCircle.001
+    13700004: BezierCircle.002
+    13700006: Body
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 0.01
+    hasPreviousCalculatedGlobalScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
