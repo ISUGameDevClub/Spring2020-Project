@@ -16,9 +16,15 @@ public class AI : MonoBehaviour
      */
     public enum EntityStatus
     {
-        None, NotSpawned, Dead, Patrol, Idle, PursuingTarget
+        None, NotSpawned, Dead, Patrol, Idle, PursuingTarget, Wandering
 
     }
+
+    public enum PathingBehavior
+    {
+        FixedPatrolPathing, RandomizedWanderPathing, Both, Neither
+    }
+
 
     public const string TAG = "AI";
     private const string ANIMATOR_STATE_IDLE = "idle";
@@ -42,38 +48,42 @@ public class AI : MonoBehaviour
     }
 
     [Header("Essentials")]
-
+    private AiManager manager;
     private GameObject target;
     private Vector3 lastRecordedPosition;
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private AIAttackType attackType;
     [SerializeField] [Range(0f, 100f)] private float stoppingDistance;
+    [SerializeField] private bool lockedInPlace;
+
+    [Header("Patrol information")]
+    [SerializeField] private GameObject[] patrolPoints;
+    [SerializeField][Range(0f, 10f)] private int delayBetweenPoints;
+
+    [Header("Pathfinding options")]
+    [SerializeField] PathingBehavior pathingBehavior;
+
+    private GameObject currentPatrolPoint;
+    private int patrolPointIndex;
 
     [Header("Enemy Attributes object data container")]
-
-    [Tooltip("This object holds all of the data attributes for the script to read from. " )]
+    [Tooltip("This object holds all of the data attributes for the script to read from. ")]
     [SerializeField] private EnemyTypeAttributes enemyAttributes;
 
     [Header("Animation settings")]
-
     [SerializeField]private Animator animator;
 
-    private EntityStatus entityStatus;
-    private bool canMove; //variable determines if AI is locked in position
-    private bool canAttack;
-    private bool interrupt; // variable determinnes if AI should halt current coroutine
-
-    private bool activateAnimationUssage; // debug perpuses
-
-    private AIAttackType currentAttackExecution;
   
-    private Coroutine attackCoroutine; // multithreaded coroutine that execute parrellel to the update method when called. Must be called ussualy only once per execution
-    
-  
+
+
+    [Header("Activtion Settings")]
+    [SerializeField]public bool customActivationRangeOverride;
+    [SerializeField][Range(1f,500f)]public float activationRange;
 
     [Header("Movement Options")] 
     [Range(0f,10f)] private float velocityModiferier;
   [Range(0f, 1000f)] private float detectionRange;
+   [SerializeField] [Range(1f, 500f)] private float wanderRadius;
 
     [Header("Debug- DO NOT SET")]
    public EntityStatus entityStatusDubug;
@@ -83,10 +93,34 @@ public class AI : MonoBehaviour
     public bool interruptedActive;
     public float navMeshPathfindingSpeed;
     public string raycastColliderInfo;
+    public string AICurrentTargetName;
+    public Vector3 AICurrentTargetLocation;
     public Vector3 targetPosition;
     public Vector3 targetsLastKnownCordinates;
     public bool persuringTarget;
     public bool inStoppingDistance;
+
+
+    private EntityStatus entityStatus;
+    private bool canMove; //variable determines if AI is locked in position
+    private bool canAttack;
+    private bool fixedPathing;
+    private bool variablePathing;
+
+    private bool interrupt; // variable determinnes if AI should halt current coroutine
+    private bool nextPoint;
+
+
+    private bool activateAnimationUssage; // debug perpuses
+
+    private AIAttackType currentAttackExecution;
+
+    private Coroutine attackCoroutine; // multithreaded coroutine that execute parrellel to the update method when called. Must be called ussualy only once per execution
+    private Coroutine delayMovementCoroutine;
+    private Coroutine wanderCoroutine;
+
+
+    private NavMeshUtils navMeshUtils = new NavMeshUtils();
 
 
 
@@ -102,29 +136,68 @@ public class AI : MonoBehaviour
     void Start()
     {
 
+
+        switch (pathingBehavior)
+        {
+            case PathingBehavior.FixedPatrolPathing:
+                fixedPathing = true;
+                variablePathing = false;
+                break;
+            case PathingBehavior.RandomizedWanderPathing:
+                fixedPathing = false;
+                variablePathing = true;
+                break;
+            case PathingBehavior.Both:
+                fixedPathing = true;
+                variablePathing = true;
+                break;
+            case PathingBehavior.Neither:
+                fixedPathing = false;
+                variablePathing = false;
+                break;
+            default:
+                break;
+        }
+
+        if (variablePathing == true)
+        {
+            entityStatus = EntityStatus.Wandering;
+        }
+
         if ((target = GameObject.FindGameObjectWithTag("Player")) != null)
         {
             target = GameObject.FindGameObjectWithTag("Player");
         }
 
+        manager = GameObject.FindGameObjectWithTag(AiManager.TAG).GetComponentInChildren<AiManager>();
+
         if (stoppingDistance <= 0)
         {
             stoppingDistance = 5;
         }
+        
+        if (wanderRadius < 1)
+        {
+            wanderRadius = 50f;
+        }
+
         CanMove = true;
-        lastRecordedPosition = target.transform.position;
-        navMeshAgent.SetDestination(target.transform.position);
         navMeshAgent.updatePosition = true;
         navMeshAgent.updateRotation = true;
+        lastRecordedPosition = Vector3.zero;
       
 
         dataValidation();
         gun = null;
         if ((gun = gameObject.GetComponentInChildren<Gun>()) != null) // chekcs if null then assigns it inside conditional statement
         { }
+
+        manager.registerAI(gameObject);
+        gameObject.GetComponent<AI>().enabled = false; // AI manager will activate
+      
         
 
-        
+ 
     }
 
     /**
@@ -146,16 +219,44 @@ public class AI : MonoBehaviour
    
         }
 
-        if (CanMove)
+        if (CanMove == true && lockedInPlace == false)
         {
             if (target != null)
             {
                 if (!(this.checkIfWithinStoppingDistance(stoppingDistance)))
                 {
-                   
-                    moveTowardsTarget();
+
+                    switch (entityStatus)
+                    {
+                        case EntityStatus.PursuingTarget:
+                            this.moveTowardsTarget();
+                            break;
+                        case EntityStatus.Patrol:
+                            this.moveTowardsTarget();
+                            break;
+                        case EntityStatus.Wandering:
+                            if (this.isTargetInLineOfSight() == false)
+                            {
+                                if (wanderCoroutine == null)
+                                {
+                                   
+                                    wanderCoroutine = StartCoroutine(wander());
+                                }
+                            }
+                            else
+                            {
+                                this.interrutAndRefocus();
+                                entityStatus = EntityStatus.PursuingTarget;
+                            }
+                             break;
+                        default:
+                            break;
+                    }
+
+                  
+                  
                     inStoppingDistance = false;
-                   if (navMeshAgent.isStopped)
+                   if (navMeshAgent.enabled == false)
                     {
                         this.resumeMovement();
                         navMeshAgent.isStopped = false;
@@ -163,7 +264,7 @@ public class AI : MonoBehaviour
                 }
                 else
                 {
-                    navMeshAgent.isStopped = true;
+                   
                     CanAttack = true;
                     if (AttackCoroutine == null)
                     {
@@ -176,6 +277,17 @@ public class AI : MonoBehaviour
                     
                     inStoppingDistance = true;
                 }
+            }
+            else
+            {
+                if (this.isTargetInLineOfSight())
+                {
+                    if (AttackCoroutine == null)
+                    {
+                        AttackCoroutine = StartCoroutine(attack(attackType));
+                    }
+                }
+
             }
         }
 
@@ -238,6 +350,29 @@ public class AI : MonoBehaviour
         navMeshPathfindingSpeed = navMeshAgent.speed;
         targetsLastKnownCordinates = lastRecordedPosition;
         targetPosition = target.transform.position;
+
+        switch (pathingBehavior)
+        {
+            case PathingBehavior.FixedPatrolPathing:
+                fixedPathing = true;
+                variablePathing = false;
+                break;
+            case PathingBehavior.RandomizedWanderPathing:
+                fixedPathing = false;
+                variablePathing = true;
+                break;
+            case PathingBehavior.Both:
+                fixedPathing = true;
+                variablePathing = true;
+                break;
+            case PathingBehavior.Neither:
+                fixedPathing = false;
+                variablePathing = false;
+                break;
+            default:
+                break;
+        }
+
     }
 
     private bool isTargetInLineOfSight()
@@ -287,17 +422,47 @@ public class AI : MonoBehaviour
     [ContextMenu("Activate pathfinding to target")]
     private void moveTowardsTarget()
     {
-        Vector3 targetPosition = target.transform.position;
+        Vector3 targetPosition = Vector3.zero;
         if (target != null)
         {
             if (!(isTargetInLineOfSight()))
             {
-                targetPosition = lastRecordedPosition;
+                if (entityStatus == EntityStatus.Patrol)
+                {
+                    targetPosition = this.handlePatrolTransition();
+                }
+                else
+                {
+                    if (lastRecordedPosition == Vector3.zero) // enemy hasnt seen player at all yet
+                    {
+                        targetPosition = this.handlePatrolTransition();
+                    }
+                    else
+                    {
+                        targetPosition = lastRecordedPosition;
+                        if (Vector3.Distance(transform.position, targetPosition) <= 0.25f)
+                        {
+                           
+                            targetPosition = this.retrievePatrolPoint();
+                        }
+                        else
+                        {
+                            targetPosition = target.transform.position;
+                            entityStatus = EntityStatus.PursuingTarget;
+                        }
+                    }
+                }
 
             }
             else
             {
-                persuringTarget = false;
+                if (entityStatus != EntityStatus.PursuingTarget)
+                {
+                    entityStatus = EntityStatus.PursuingTarget;
+                    this.interrutAndRefocus(); // interrupts current proccess to start new one. In this case persuing target
+                }
+                targetPosition = target.transform.position;
+                
 
                 if (AttackCoroutine == null)
                 {
@@ -309,8 +474,30 @@ public class AI : MonoBehaviour
                 transform.rotation = Quaternion.LookRotation(target.transform.position - gun.bulletSpawn.transform.position);
             }
 
-            if (navMeshAgent.destination != targetPosition)
+            switch (entityStatus)
             {
+                case EntityStatus.Patrol:
+                    if (currentPatrolPoint != null)
+                    {
+                        AICurrentTargetName = currentPatrolPoint.name;
+                    }
+                    else
+                        AICurrentTargetName = "";
+                    break;
+                case EntityStatus.PursuingTarget:
+                    AICurrentTargetName = target.name;
+                    break;
+                default:
+                    break;
+            }
+         
+            AICurrentTargetLocation = targetPosition;
+            if (this.isStopped())
+            {
+                this.resumeMovement();
+            }
+            if (navMeshAgent.destination != targetPosition)
+            {          
                 navMeshAgent.SetDestination(targetPosition);
             }
 
@@ -332,6 +519,221 @@ public class AI : MonoBehaviour
 
     }
 
+    public IEnumerator wander()
+    {
+
+
+        Vector3 newPos = RandomNavmeshLocation(wanderRadius); // gets random point on navmesh
+        while (true)
+        {
+            NavMeshPath path = new NavMeshPath();
+            navMeshAgent.CalculatePath(newPos, path);
+            if (path.status != NavMeshPathStatus.PathComplete) // checks to make sure that a path can be calcultaed with given random point
+            {
+                Debug.Log("Invalid path");
+                newPos = NavMeshUtils.RandomNavSphere(transform.position, wanderRadius, -1);
+            }
+            else
+            {
+                break;
+
+            }
+           
+        }
+        AICurrentTargetLocation = newPos;
+
+        navMeshAgent.SetDestination(newPos);
+        yield return new WaitUntil(() => Vector3.Distance(gameObject.transform.position, newPos) <= 0.25f);
+        wanderCoroutine = null;
+
+    }
+
+    /**
+     * 
+     * Handles the tranition to a ptrol like state.
+     * The following process includes finding the nerest patrol point to make a fluid transition.
+     */
+    public Vector3 handlePatrolTransition()
+    {
+        if (patrolPoints != null)
+        {
+            entityStatus = EntityStatus.Patrol;
+            if (currentPatrolPoint == null)
+            {
+                Debug.Log("Same");
+                return this.retrievePatrolPoint();
+            }
+            else if (Vector3.Distance(gameObject.transform.position, currentPatrolPoint.transform.position) <= 1f)
+            {
+
+                return this.retrieveNextPatrolPoint();
+            }
+            else
+            {
+                return currentPatrolPoint.transform.position;
+            }
+        }
+       
+        return Vector3.zero; // is null bassically
+    }
+
+    /**
+     * 
+     * 
+     */
+    public Vector3 retrievePatrolPoint()
+    {
+        int index = -1; // init to  null value
+        Vector3 closestVec;
+        float closestDistance = -100f;
+      for (int i =0; i < patrolPoints.Length; i++)
+        {
+            if (i == 0)
+            {
+                closestVec = patrolPoints[i].transform.position;
+                closestDistance = Vector3.Distance(transform.position, closestVec);
+                index = i;
+            }
+            else
+            {
+                Vector3 vec = patrolPoints[i].transform.position;
+                float newDistance = Vector3.Distance(transform.position, patrolPoints[i].transform.position);
+                if (newDistance < closestDistance)
+                {
+                    closestDistance = newDistance;
+                    closestVec = patrolPoints[i].transform.position;
+                    index = i;
+                }
+                
+            }
+        }
+
+        currentPatrolPoint = patrolPoints[index];
+        return currentPatrolPoint.transform.position;
+    }
+
+    /**
+     * 
+     * 
+     */
+    public Vector3 retrieveNextPatrolPoint()
+    {
+        int newIndex = -1;
+        newIndex = patrolPointIndex + 1; // this is very different then patrolIndex++. this is because we dont want to increment here but after the if statements
+        if (newIndex < patrolPoints.Length)
+        {
+            patrolPointIndex = newIndex;
+            currentPatrolPoint = patrolPoints[newIndex];
+        }
+        else
+        {
+            patrolPointIndex = 0;
+            currentPatrolPoint = patrolPoints[patrolPointIndex];
+        }
+        startDelayMovementCoroutine(delayBetweenPoints);
+        return currentPatrolPoint.transform.position;
+    }
+
+    /**
+     * 
+     */
+    public void startDelayMovementCoroutine(int seconds)
+    {
+        if (delayMovementCoroutine == null)
+        {
+            delayMovementCoroutine = StartCoroutine(delayMovement(seconds));
+        }
+    }
+
+    /**
+     * 
+     */
+    private IEnumerator delayMovement(int seconds)
+    {
+        canMove = false;
+        this.stopMovement();
+        StartCoroutine(patrolStoppedAnimation(seconds));
+        yield return new WaitForSeconds(seconds);
+        yield return new WaitForEndOfFrame();
+        this.resumeMovement();
+        canMove = true;
+        delayMovementCoroutine = null;
+    }
+
+    private IEnumerator patrolStoppedAnimation(int seconds)
+    {
+         int div = 100 * seconds;
+         float feed =(float)seconds / div;
+        float xx = 180 / (div / 2);
+        var desiredRotQ = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y + 180, transform.eulerAngles.z);
+        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotQ, Time.deltaTime * div * 10);
+
+        
+            var fromAngle = transform.rotation;
+            var toAngle = Quaternion.Euler(transform.eulerAngles +  (Vector3.up * 180));
+            for (var t = 0f; t < 1; t += Time.deltaTime /(seconds / 2))
+            {
+                transform.rotation = Quaternion.Slerp(toAngle, fromAngle, t);
+                yield return null;
+            }
+
+           // toAngle = Quaternion.Euler(transform.eulerAngles - (Vector3.up * 180));
+        for (var t = 0f; t < 1; t += Time.deltaTime / (seconds / 2))
+        {
+            transform.rotation = Quaternion.Lerp(fromAngle, toAngle, t);
+            yield return null;
+        }
+
+       
+
+        /*
+        for (int i = 0; i < div; i++)
+        {
+            if (i < div / 2)
+            {
+                var desiredRotQ = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y + xx, transform.eulerAngles.z);
+                transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotQ, Time.deltaTime * div * 10);
+            }
+            else
+            {
+                var desiredRotQ = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y - xx, transform.eulerAngles.z);
+                transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotQ, Time.deltaTime * div* 10);
+            }
+            yield return new WaitForSeconds(feed);
+            Debug.Log(feed);
+        }
+        */
+        // yield return new WaitForSeconds(seconds);
+
+
+
+
+    }
+
+    /**
+     * 
+     */
+    public void interrutAndRefocus()
+    {
+        if (delayMovementCoroutine != null)
+        {
+            StopCoroutine(delayMovementCoroutine);
+            delayMovementCoroutine = null;
+            canMove = true;
+            navMeshAgent.isStopped = false;
+            navMeshAgent.enabled = true;
+        }
+
+        if (wanderCoroutine != null)
+        {
+            wanderCoroutine = null;
+            navMeshAgent.SetDestination(gameObject.transform.position);
+
+        }
+
+
+    }
+
     /**
      * 
      */
@@ -340,11 +742,11 @@ public class AI : MonoBehaviour
     {
         if (navMeshAgent != null)
         {
-            if (navMeshAgent.isStopped == false)
-            {
-                navMeshAgent.SetDestination(gameObject.transform.position);
+
+            // navMeshAgent.SetDestination(gameObject.transform.position);
+            navMeshAgent.isStopped = true;
             
-            }
+            
         }
 
     }
@@ -356,17 +758,18 @@ public class AI : MonoBehaviour
     {
         if (navMeshAgent != null)
         {
-           
-            if (enemyAttributes != null)
-            {
-                navMeshAgent.SetDestination(target.transform.position);
+
+
+            navMeshAgent.isStopped = false;
+               // navMeshAgent.SetDestination(target.transform.position);
                 
                 // navMeshAgent.acceleration = enemyAttributes.getMovementSpeed;
 
-            }
+           
         }
       
     }
+
     /**
      * 
      */
@@ -439,6 +842,10 @@ public class AI : MonoBehaviour
         }
         
     }
+    public bool isStopped()
+    {
+        return navMeshAgent.isStopped;
+    }
 
     /**
      * checks to see if the weapon equppied is a gun vs melle weapin
@@ -494,6 +901,10 @@ public class AI : MonoBehaviour
     private void OnDestroy()
     {
         StopAllCoroutines();
+        if (manager != null)
+        {
+            manager.unRegisterAI(gameObject);
+        }
        // Debug.Log(gameObject.name + " was destroyed");
         
     }
@@ -578,5 +989,40 @@ public class AI : MonoBehaviour
     public static string ANIMATOR_STATE_GUN_TWO1 => ANIMATOR_STATE_GUN_TWO;
 
     public static string ANIMATOR_STATE_GUN_THREE1 => ANIMATOR_STATE_GUN_THREE;
+
+    private class PatrolManager
+    {
+
+    }
+
+    private class NavMeshUtils
+    {
+        public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
+        {
+            Vector3 randDirection = Random.insideUnitSphere * dist;
+
+            randDirection += origin;
+
+            NavMeshHit navHit;
+
+            NavMesh.SamplePosition(randDirection, out navHit, dist, layermask);
+
+            return navHit.position;
+        }
+    }
+
+    public Vector3 RandomNavmeshLocation(float radius)
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * radius;
+        randomDirection += transform.position;
+        NavMeshHit hit;
+        Vector3 finalPosition = Vector3.zero;
+        if (NavMesh.SamplePosition(randomDirection, out hit, radius, 1))
+        {
+            finalPosition = hit.position;
+        }
+        return finalPosition;
+    }
+
 
 }

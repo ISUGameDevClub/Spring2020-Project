@@ -158,8 +158,15 @@ MonoBehaviour:
   navMeshAgent: {fileID: 7456569095909847490}
   attackType: 0
   stoppingDistance: 10
+  lockedInPlace: 0
+  patrolPoints: []
+  delayBetweenPoints: 4
+  pathingBehavior: 1
   enemyAttributes: {fileID: 0}
   animator: {fileID: 0}
+  customActivationRangeOverride: 0
+  activationRange: 0
+  wanderRadius: 0
   entityStatusDubug: 0
   entityLocation: {x: 0, y: 0, z: 0}
   canMoveDebug: 0
@@ -167,6 +174,8 @@ MonoBehaviour:
   interruptedActive: 0
   navMeshPathfindingSpeed: 0
   raycastColliderInfo: 
+  AICurrentTargetName: 
+  AICurrentTargetLocation: {x: 0, y: 0, z: 0}
   targetPosition: {x: 0, y: 0, z: 0}
   targetsLastKnownCordinates: {x: 0, y: 0, z: 0}
   persuringTarget: 0
