@@ -81,8 +81,5 @@ public class CameraController : MonoBehaviour
         cr.transform.rotation = new Quaternion(0, 0, 0, 0);
     }
 
-    private void OnGUI()
-    {
-        GUI.Box(new Rect(Screen.width / 2, Screen.height / 2, 10, 10), "");
-    }
+   
 }

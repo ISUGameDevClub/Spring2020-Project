@@ -28,7 +28,7 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
-        if (isPlayer)
+        if (isPlayer && !FindObjectOfType<PauseMenu>().gamePaused)
         {
             if (Input.GetMouseButtonDown(0) && canFire && ammo > 0)
             {

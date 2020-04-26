@@ -25,6 +25,11 @@ public class GrapplingHook : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         canFire = true;
         fireHook = KeyCode.E;
+
+        rope = hook.GetComponent<LineRenderer>();
+        rope.SetVertexCount(2);
+        rope.SetPosition(0, hookHolder.transform.position);
+        rope.SetPosition(1, hook.transform.position);
     }
 
     // Update is called once per frame
@@ -51,7 +56,8 @@ public class GrapplingHook : MonoBehaviour
         {
             hooked = false;
         }
-        //rendering the rope
+
+        //rendering the rope POTENTIAL ISSUE
         DrawRope();
 
         //returning the hook
@@ -88,8 +94,19 @@ public class GrapplingHook : MonoBehaviour
         else
         {
             hook.transform.parent = hookHolder.transform;
-            gameObject.GetComponent<Rigidbody>().useGravity = true;
+            //gameObject.GetComponent<Rigidbody>().useGravity = true;
         }
+    }
+
+    public void HookReleaseWrapper()
+    {
+        StartCoroutine(HookRelease());
+    }
+
+    public IEnumerator HookRelease()
+    {
+        yield return new WaitForSeconds(2);
+        ReturnHook();
     }
 
     public void ReturnHook()
@@ -115,7 +132,7 @@ public class GrapplingHook : MonoBehaviour
         }
         else
         {
-            rope.SetVertexCount(0);
+            rope.positionCount=0;
         }
     }
 

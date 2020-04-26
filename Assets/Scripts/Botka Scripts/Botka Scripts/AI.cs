@@ -303,9 +303,11 @@ public class AI : MonoBehaviour
      
             if (this.checkIfWithinStoppingDistance(stoppingDistance))
             {
+                Debug.Log("1");
                 CanAttack = true;
                 if (AttackCoroutine == null)
                 {
+                    Debug.Log("2");
                     AttackCoroutine = StartCoroutine(attack(attackType));
                 }
                 stopMovement();
@@ -385,6 +387,12 @@ public class AI : MonoBehaviour
 
     }
 
+    [ContextMenu("attack")]
+    private void x()
+    {
+        StartCoroutine(executeAttack(AIAttackType.Gun));
+    }
+
     /**
      * @param attackType
      * Exeuctes attack using a couroutine that is dependent on the return value of @param.
@@ -398,6 +406,7 @@ public class AI : MonoBehaviour
                 if (gun != null)
                 {
                     gun.EnemyFire();
+                    Debug.Log("shooting");
                 }
                 break;
             case AIAttackType.Physical:
